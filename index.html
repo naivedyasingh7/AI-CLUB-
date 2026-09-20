@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="utf-8">
+        <meta name="language" content="English">
+        <meta name="format-detection" content="telephone=no">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <title>AI CLUB - VIT BHOPAL</title>
+        <script>
+            const meta = document.querySelector('meta[name="viewport"]');
+            meta.setAttribute('content', `user-scalable=no, width=${screen.width <= 420 ? 420 : 'device-width'}`);
+        </script>
+        <link rel="stylesheet" href="/css/libs.min.css?cb=1751366445799">
+        <link rel="stylesheet" href="/css/main.min.css?cb=1751366445799">
+        <link rel="icon" type="image/png" href="/img/favicon.png">
+        <style>
+            .introduction-text {
+                margin-top: 30px !important;
+                font-size: 22px !important;
+                max-width: 550px !important;
+            }
+            .introduction-title .introduction-label {
+                top: -50px !important;
+                font-size: 24px !important;
+            }
+        </style>
+    </head>
+    <body>
+
+        <header class="header header-home">
+    <div class="header-logo">
+        <a href="/">
+            <img src="/img/svg/ai-club-logo-white.svg" alt="AI CLUB">
+        </a>
+    </div>
+    <ul class="header-nav">
+        <li><a href="/" class="hover-effect hover-effect--bg">Home</a></li>
+               <li><a href="/services" class="hover-effect hover-effect--bg">Services</a></li>
+               <li><a href="/about" class="hover-effect hover-effect--bg">About</a></li>
+               <li><a href="/contacts" class="hover-effect hover-effect--bg">Contact</a></li>
+    </ul>
+    <div class="header-burger js-open-menu"></div>
+</header>
+
+<div class="menu">
+    <div class="menu-head">
+        <div class="menu-logo" style="font-size: 24px; font-weight: 900; color: white; display: inline-block; font-family: sans-serif;">AI CLUB</div>
+        <div class="menu-close js-open-menu">close</div>
+    </div>
+    <div class="menu-main">
+        <div class="menu-row">
+            <div class="menu-side">
+                <div class="menu-label">Discover</div>
+            </div>
+            <div class="menu-content">
+                <ul class="menu-nav">
+                    <li data-video="https://hackfirst.io/video/menu-01.mp4"><a href="/">Home</a></li>
+                                       <li data-video="https://hackfirst.io/video/menu-02.mp4"><a href="/services">Services</a></li>
+                                       <li data-video="https://hackfirst.io/video/menu-03.mp4"><a href="/about">About</a></li>
+                                       <li data-video="https://hackfirst.io/video/menu-04.mp4"><a href="/contacts">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="menu-bottom">
+        <div class="menu-row">
+            <div class="menu-side">
+                <div class="menu-label">Socials</div>
+            </div>
+            <div class="menu-content">
+                <ul class="menu-socials">
+                    <li><a href="#" class="hover-effect hover-effect--bg">Facebook</a></li>
+                    <li><a href="#" class="hover-effect hover-effect--bg">LinkedIn</a></li>
+                    <li><a href="#" class="hover-effect hover-effect--bg">X</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="menu-video__wrapper">
+        <video preload playsinline autoplay loop muted class="menu-video"></video>
+    </div>
+</div>
+
+<!-- loader -->
+<div class="loader">
+    <video preload playsinline autoplay loop muted class="loader-bg">
+        <source src="https://hackfirst.io/video/loader.mp4" type="video/mp4">
+    </video>
+    <div class="loader-dots"><span></span><span></span><span></span><span></span></div>
+    <img src="/img/svg/loader-circle-1.svg" alt="" class="loader-circle-1">
+    <img src="/img/svg/loader-circle-2.svg" alt="" class="loader-circle-2">
+    <div class="loader-count">
+        <div id="i" class="odometer">00</div>
+        <div class="loader-percent">%</div>
+    </div>
+    <div class="loader-utc">UTC +00:00</div>
+    <div class="loader-time">00:00:00</div>
+    <div class="loader-text" animate-blur-text data-instant>AI Club: Innovating the future. Mastering Technology. At AI Club, we believe that building is the best learning</div>
+</div>
+
+<script>
+	const loaderUTC = document.querySelector('.loader-utc');
+	const loaderTime = document.querySelector('.loader-time');
+
+	function updateTime() {
+		const now = new Date();
+
+		const timeStr = now.toLocaleTimeString('en-GB', {
+			hour12: false,
+			hour: '2-digit',
+			minute: '2-digit',
+			second: '2-digit'
+		});
+
+		const offset = now.getTimezoneOffset();
+		const absOffset = Math.abs(offset);
+		const hours = String(Math.floor(absOffset / 60)).padStart(2, '0');
+		const minutes = String(absOffset % 60).padStart(2, '0');
+		const sign = offset <= 0 ? '+' : '-';
+		const utcStr = `UTC ${sign}${hours}:${minutes}`;
+
+		loaderUTC.innerHTML = utcStr;
+		loaderTime.innerHTML = timeStr;
+	}
+
+	updateTime();
+	setInterval(updateTime, 1000);
+</script>
+<!-- end loader -->
+
+<section class="hero">
+    <video preload playsinline autoplay loop muted class="hero-bg">
+        <source src="https://hackfirst.io/video/tornado-home.mp4" type="video/mp4">
+    </video>
+    <div class="hero-content">
+        <img src="/img/svg/ai-club-logo-custom.svg" alt="A.I. CLUB Graphic Logo" style="width: 250px; margin-bottom: 20px; display: block; transform: translateX(30px);" animate-blur-el />
+        <span class="hero-label" animate-blur-text>TENURE 26-27</span>
+        <h1 class="hero-title" animate-blur-text><span class="hero-glitch-trigger" style="display:inline-block; cursor:crosshair;">AI CLUB</span><br>18 Community Groups:<br>Event Management, PR, AI/ML &amp; more.</h1>
+    </div>
+</section>
+
+<section class="introduction">
+    <div class="introduction-title">
+        <span class="introduction-label" animate-blur-text>Introduction</span>
+        <h2 class="title-md" animate-blur-text>Traditional learning requires more than standard coursework. <span>Lectures and assignments based on syllabus requirements are not enough to build real AI</span></h2>
+    </div>
+    <div class="introduction-text" animate-blur-el>Standard academic coursework covers only superficial concepts. They do not simulate building by real engineers and do not emulate complex methods such as <span>model deployment</span>, <span>data pipelines</span>, <span>cloud infrastructure</span> and <span>persistent presence in the industry</span>.</div>
+    <div class="introduction-list">
+        <div class="introduction-list__item">
+            <div class="introduction-list__count">
+                <p>Doc.</p>
+            </div>
+            <div class="introduction-list__value">
+                <b data-counter>95%</b>
+                <p>{. of students }</p>
+            </div>
+            <div class="introduction-list__text">lack practical AI experience</div>
+        </div>
+        <div class="introduction-list__item">
+            <div class="introduction-list__count">
+                <p>Doc.</p>
+            </div>
+            <div class="introduction-list__value">
+                <b data-counter>60%</b>
+                <p>{. of tech roles }</p>
+            </div>
+            <div class="introduction-list__text">require advanced AI skills today</div>
+        </div>
+        <div class="introduction-list__item">
+            <div class="introduction-list__count">
+                <p>Doc.</p>
+            </div>
+            <div class="introduction-list__value">
+                <b data-counter>200+</b>
+            </div>
+            <div class="introduction-list__text">active community members</div>
+        </div>
+    </div>
+</section>
+
+<section class="solution">
+    <div class="solution-container">
+        <div class="solution-screen">
+            <video preload playsinline autoplay loop muted class="solution-bg" lazy-video data-src="https://hackfirst.io/video/solution-01.mp4"></video>
+            <div class="solution-content">
+                <span class="solution-label" animate-blur-text>THE SOLUTION</span>
+                <h2 class="title" animate-blur-text>Practical Experience Can Define You</h2>
+            </div>
+        </div>
+        <div class="solution-screen">
+            <video preload playsinline autoplay loop muted class="solution-bg" lazy-video data-src="https://hackfirst.io/video/solution-02.mp4"></video>
+        </div>
+        <div class="solution-screen">
+            <video preload playsinline autoplay loop muted class="solution-bg" lazy-video data-src="https://hackfirst.io/video/solution-03.mp4"></video>
+            <div class="solution-content">
+                <span class="solution-label" animate-blur-text>THE SOLUTION</span>
+                <h2 class="title" animate-blur-text>Collaborative learning gives you an edge</h2>
+            </div>
+        </div>
+        <div class="solution-screen problem">
+            <div class="problem-content">
+                <span class="problem-label">The problem</span>
+                <h2 class="problem-title">How do standard academic methods fall short?</h2>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="issue">
+    <div class="issue-item">
+        <video preload playsinline autoplay loop muted class="issue-item__bg" lazy-video data-src="https://hackfirst.io/video/issue-01.mp4"></video>
+        <div class="issue-item__content">
+            <h2 class="issue-item__title">Theory &#8800; Practice</h2>
+            <p class="issue-item__text"> Completing a standard course does not translate into real-world AI skills.</p>
+        </div>
+        <div class="issue-item__label">Theory &#8800; Practice</div>
+    </div>
+    <div class="issue-item">
+        <video preload playsinline autoplay loop muted class="issue-item__bg" lazy-video data-src="https://hackfirst.io/video/issue-02.mp4"></video>
+        <div class="issue-item__content">
+            <h2 class="issue-item__title">Limited coursework</h2>
+            <p class="issue-item__text">Most tests only check for obLimited courseworkvious vulnerabilities and do&#160;not simulate real attacks.</p>
+        </div>
+        <div class="issue-item__label">Limited coursework</div>
+    </div>
+    <div class="issue-item">
+        <video preload playsinline autoplay loop muted class="issue-item__bg" lazy-video data-src="https://hackfirst.io/video/issue-03.mp4"></video>
+        <div class="issue-item__content">
+            <h2 class="issue-item__title">Real industry uses dynamic AI models</h2>
+            <p class="issue-item__text">Real industry uses dynamic AI models</p>
+        </div>
+        <div class="issue-item__label">Real industry uses dynamic AI models</div>
+    </div>
+</section>
+
+<section class="defeat">
+    <div class="defeat-body">
+        <div class="defeat-wrapper">
+            <video preload playsinline autoplay loop muted class="defeat-bg" lazy-video data-src="https://hackfirst.io/video/defeat.mp4"></video>
+            <div class="defeat-content">
+                <div class="defeat-access" animate-blur-text>Status Confirmed:</div>
+                <h2 class="defeat-title" animate-blur-text>They said AI was hard. But now you're building it</h2>
+                <p class="defeat-text" animate-blur-text>To master AI, you need to build with AI.</p>
+            </div>
+            <div class="defeat-notify">🔒 Status Confirmed: Document is&#160;secure. return False else: print (&#171;⚠️ Intrusion Detected! System lockdown initiated.&#187;) return False # The hack failed</div>
+        </div>
+    </div>
+</section>
+
+<div class="layout-title" data-layout="01">Solution</div>
+<div class="layout-title" data-layout="02">About</div>
+<div class="layout-title" data-layout="03">Technologies</div>
+<div class="layout-title" data-layout="04">Members</div>
+
+<div class="layout-count" data-layout="01">01</div>
+<div class="layout-count" data-layout="02">02</div>
+<div class="layout-count" data-layout="03">03</div>
+<div class="layout-count" data-layout="04">04</div>
+
+<section class="hackfirst" data-layout="01">
+    <div class="layout-head">
+        <span>Solution</span>
+        <span>01</span>
+    </div>
+    <img src="/img/svg/ai-club-logo-black.svg" alt="AI CLUB" animate-blur-el loading="lazy">
+    <p class="hackfirst-text" animate-blur-text>The ultimate community for modern AI engineers</p>
+</section>
+
+<section class="about-video">
+    <video preload playsinline autoplay loop muted lazy-video data-src="https://hackfirst.io/video/about-video-3.mp4"></video>
+</section>
+
+<section class="about" data-layout="02">
+    <div class="about-line">
+        <span>A</span>
+        <span>community</span>
+        <span>of</span>
+        <span>the</span>
+        <span>best</span>
+        <span>independent</span>
+        <span>student</span>
+        <span>researchers</span>
+    </div>
+    <div class="layout-head">
+        <span>About</span>
+        <span>02</span>
+    </div>
+    <div class="about-content">
+        <span class="about-label" animate-blur-text>Features & Technologies</span>
+        <h2 class="title-md" animate-blur-text><span>AI Club teams build state-of-the-art models in</span> collaborative environments that push boundaries</h2>
+        <p class="about-text" animate-blur-el>Capitalize Leveraging our proprietary research, and deploying whole teams of elite students working in unison — learners with a builder mindset.</p>
+    </div>
+    <div class="about-list">
+        <div class="about-list__item">
+            <span>Deep Learning</span>
+        </div>
+        <div class="about-list__item">
+            <span>Computer Vision</span>
+        </div>
+        <div class="about-list__item">
+            <span>Generative AI</span>
+        </div>
+    </div>
+</section>
+
+<section class="technologies" data-layout="03">
+    <div class="technologies-wrapper">
+        <div class="technologies-separator">
+            <span></span>
+            <i></i>
+            <span></span>
+            <i></i>
+            <span></span>
+        </div>
+        <div class="layout-head">
+            <span>Technologies</span>
+            <span>03</span>
+        </div>
+        <div class="technologies-image"><span><video preload playsinline autoplay loop muted lazy-video data-src="https://hackfirst.io/video/technologies.mp4"></video></span></div>
+        <div class="technologies-separator">
+            <span></span>
+            <i></i>
+            <span></span>
+            <i></i>
+            <span></span>
+        </div>
+    </div>
+    <div class="technologies-content">
+        <div class="technologies-item" animate-blur-el>
+            <h4>Practical AI Development</h4>
+            <p>Experience building models modeled after real-world production systems, testing architecture against challenges from real datasets and APIs</p>
+        </div>
+        <div class="technologies-item" animate-blur-el>
+            <h4>Safe & Controlled Environments</h4>
+            <p>Conduct research without disrupting operations, allowing focus on strengthening models securely.</p>
+        </div>
+        <div class="technologies-item" animate-blur-el>
+            <h4>Advanced AI Frameworks</h4>
+            <p>Utilize advanced AI frameworks to emulate sophisticated ML strategies, uncovering insights others miss.</p>
+        </div>
+        <div class="technologies-item" animate-blur-el>
+            <h4>World-Class Student Builders</h4>
+            <p>Collaborate with a team of world-class student engineers who think like industry professionals and use their skills to innovate.</p>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+<style>
+.members-gallery-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background: #050505;
+    overflow: hidden;
+}
+.members-gallery-pin {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+.member-slide {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    will-change: transform;
+}
+.member-slide-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transform-origin: center center;
+    will-change: transform, opacity;
+}
+.member-photo-large {
+    width: 400px;
+    height: 400px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 150px;
+    font-weight: 900;
+    color: rgba(255,255,255,0.2);
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+}
+.member-photo-large::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 50%; height: 100%;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
+    transform: skewX(-20deg);
+}
+.member-info-large {
+    text-align: center;
+}
+.member-name-large {
+    font-size: 48px;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+}
+.member-role-large {
+    font-size: 20px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    font-weight: 600;
+}
+.layout-head-overlay {
+    position: absolute;
+    top: 100px;
+    left: 100px;
+    z-index: 10;
+}
+</style>
+
+<section class="members-gallery-container" data-layout="04">
+    <div class="layout-head layout-head-overlay">
+        <span>Members</span>
+        <span>04</span>
+    </div>
+    
+    <div class="members-gallery-pin">
+        <!-- Member 1 -->
+        <div class="member-slide">
+            <div class="member-slide-inner">
+                <div class="member-photo-large">A</div>
+                <div class="member-info-large">
+                    <div class="member-name-large">Alex Mercer</div>
+                    <div class="member-role-large">Deep Learning Lead</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Member 2 -->
+        <div class="member-slide">
+            <div class="member-slide-inner">
+                <div class="member-photo-large">S</div>
+                <div class="member-info-large">
+                    <div class="member-name-large">Samira Jones</div>
+                    <div class="member-role-large">Computer Vision</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Member 3 -->
+        <div class="member-slide">
+            <div class="member-slide-inner">
+                <div class="member-photo-large">D</div>
+                <div class="member-info-large">
+                    <div class="member-name-large">David Chen</div>
+                    <div class="member-role-large">Generative AI</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Member 4 -->
+        <div class="member-slide">
+            <div class="member-slide-inner">
+                <div class="member-photo-large">E</div>
+                <div class="member-info-large">
+                    <div class="member-name-large">Elena Rostova</div>
+                    <div class="member-role-large">NLP Researcher</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="started">
+    <video preload playsinline autoplay loop muted class="started-bg" lazy-video data-src="https://hackfirst.io/video/started.mp4"></video>
+    <div class="started-content">
+        <span class="started-label" animate-blur-text>AI Club is the premier technical community</span>
+        <h2 class="title-md" animate-blur-text>Are you truly ready to build the future of AI?</h2>
+        <p class="started-text" animate-blur-text>With AI Club's intensive research groups, you're not just learning theory — you're building reality</p>
+        <a href="#" class="started-btn" animate-blur-el>Get started</a>
+    </div>
+</section>
+
+<footer class="footer">
+    <video preload playsinline autoplay loop muted class="footer-bg" lazy-video data-src="https://hackfirst.io/video/footer.mp4"></video>
+    <div class="footer-row">
+        <div class="footer-col">
+            <div class="footer-logo" style="font-size: 36px; font-weight: 900; color: white; display: inline-block; font-family: sans-serif;">AI CLUB</div>
+        </div>
+        <div class="footer-col">
+            <div class="footer-about">
+                <span>about</span>
+                <p>AI Club: Innovating the future. Mastering Technology. At AI Club, we don't just learn—we build.</p>
+            </div>
+        </div>
+    </div>
+    <div class="footer-row">
+        <div class="footer-col">
+            <div class="footer-nav">
+                <p>Socials</p>
+                <ul>
+                    <li><a href="#" class="hover-effect hover-effect--bg">Facebook</a></li>
+                    <li><a href="#" class="hover-effect hover-effect--bg">LinkedIn</a></li>
+                    <li><a href="#" class="hover-effect hover-effect--bg">X</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-col">
+            <div class="footer-nav">
+                <p>Navigation</p>
+                <ul>
+                    <li><a href="/" class="hover-effect hover-effect--bg">Home</a></li>
+                                       <li><a href="/services" class="hover-effect hover-effect--bg">Services</a></li>
+                                       <li><a href="/about" class="hover-effect hover-effect--bg">About</a></li>
+                                       <li><a href="/contacts" class="hover-effect hover-effect--bg">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<div class="scroll-progress">
+    <div class="scroll-progress__animate">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    <div class="scroll-progress__percent">0%</div>
+</div>
+
+        <script defer src="/js/libs.min.js?cb=1751366445799"></script>
+        <script defer src="/js/animate.js?cb=1751366445799"></script>
+        <script defer src="/js/main.min.js?cb=1751366445799"></script>
+    <script defer src="/js/members-animation.js"></script>
+    </body>
+</html>

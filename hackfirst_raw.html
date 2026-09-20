@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="utf-8">
+        <meta name="language" content="English">
+        <meta name="format-detection" content="telephone=no">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <title>HackFirst.io | Home</title>
+        <script>
+            const meta = document.querySelector('meta[name="viewport"]');
+            meta.setAttribute('content', `user-scalable=no, width=${screen.width <= 420 ? 420 : 'device-width'}`);
+        </script>
+        <link rel="stylesheet" href="/css/libs.min.css?cb=1751366445799">
+        <link rel="stylesheet" href="/css/main.min.css?cb=1751366445799">
+        <link rel="icon" type="image/png" href="/img/favicon.png">
+    </head>
+    <body>
+
+        <header class="header header-home">
+    <div class="header-logo">
+        <a href="/">
+            <img src="/img/svg/logo-new.svg" alt="">
+        </a>
+    </div>
+    <ul class="header-nav">
+        <li><a href="/" class="hover-effect hover-effect--bg">Home</a></li>
+               <li><a href="/services" class="hover-effect hover-effect--bg">Services</a></li>
+               <li><a href="/about" class="hover-effect hover-effect--bg">About</a></li>
+               <li><a href="/contacts" class="hover-effect hover-effect--bg">Contact</a></li>
+    </ul>
+    <div class="header-burger js-open-menu"></div>
+</header>
+
+<div class="menu">
+    <div class="menu-head">
+        <img src="/img/svg/logo-new.svg" alt="" class="menu-logo">
+        <div class="menu-close js-open-menu">close</div>
+    </div>
+    <div class="menu-main">
+        <div class="menu-row">
+            <div class="menu-side">
+                <div class="menu-label">Discover</div>
+            </div>
+            <div class="menu-content">
+                <ul class="menu-nav">
+                    <li data-video="video/menu-01.mp4"><a href="/">Home</a></li>
+                                       <li data-video="video/menu-02.mp4"><a href="/services">Services</a></li>
+                                       <li data-video="video/menu-03.mp4"><a href="/about">About</a></li>
+                                       <li data-video="video/menu-04.mp4"><a href="/contacts">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="menu-bottom">
+        <div class="menu-row">
+            <div class="menu-side">
+                <div class="menu-label">Socials</div>
+            </div>
+            <div class="menu-content">
+                <ul class="menu-socials">
+                    <li><a href="#" class="hover-effect hover-effect--bg">Facebook</a></li>
+                    <li><a href="#" class="hover-effect hover-effect--bg">LinkedIn</a></li>
+                    <li><a href="#" class="hover-effect hover-effect--bg">X</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="menu-video__wrapper">
+        <video preload playsinline autoplay loop muted class="menu-video"></video>
+    </div>
+</div>
+
+<!-- loader -->
+<div class="loader">
+    <video preload playsinline autoplay loop muted class="loader-bg">
+        <source src="/video/loader.mp4" type="video/mp4">
+    </video>
+    <div class="loader-dots"><span></span><span></span><span></span><span></span></div>
+    <img src="/img/svg/loader-circle-1.svg" alt="" class="loader-circle-1">
+    <img src="/img/svg/loader-circle-2.svg" alt="" class="loader-circle-2">
+    <div class="loader-count">
+        <div id="i" class="odometer">00</div>
+        <div class="loader-percent">%</div>
+    </div>
+    <div class="loader-utc">UTC +00:00</div>
+    <div class="loader-time">00:00:00</div>
+    <div class="loader-text" animate-blur-text data-instant>HackFirst: Outsmarting Attackers. Securing Tomorrow. At&#160;HackFirst, we&#160;believe that attack is&#160;the best defense</div>
+</div>
+
+<script>
+	const loaderUTC = document.querySelector('.loader-utc');
+	const loaderTime = document.querySelector('.loader-time');
+
+	function updateTime() {
+		const now = new Date();
+
+		const timeStr = now.toLocaleTimeString('en-GB', {
+			hour12: false,
+			hour: '2-digit',
+			minute: '2-digit',
+			second: '2-digit'
+		});
+
+		const offset = now.getTimezoneOffset();
+		const absOffset = Math.abs(offset);
+		const hours = String(Math.floor(absOffset / 60)).padStart(2, '0');
+		const minutes = String(absOffset % 60).padStart(2, '0');
+		const sign = offset <= 0 ? '+' : '-';
+		const utcStr = `UTC ${sign}${hours}:${minutes}`;
+
+		loaderUTC.innerHTML = utcStr;
+		loaderTime.innerHTML = timeStr;
+	}
+
+	updateTime();
+	setInterval(updateTime, 1000);
+</script>
+<!-- end loader -->
+
+<section class="hero">
+    <video preload playsinline autoplay loop muted class="hero-tornado">
+        <source src="/video/tornado-home.mp4" type="video/mp4">
+    </video>
+    <div class="hero-content">
+        <span class="hero-label" animate-blur-text data-instant>Cyberattack simulations</span>
+        <h1 class="hero-title" animate-blur-text data-instant>Most advanced cyberattack simulations: HackFirst&#8482;</h1>
+    </div>
+</section>
+
+<section class="introduction">
+    <div class="introduction-title">
+        <span class="introduction-label" animate-blur-text>Introduction</span>
+        <h2 class="title" animate-blur-text>Modern threats require more than standard checks. <span>Audits and pentests based on&#160;compliance requirements are not enough to&#160;protect against real attacks</span></h2>
+    </div>
+    <div class="introduction-text" animate-blur-el>Compliance-based audits and pentests identify only superficial vulnerabilities. They do&#160;not simulate attacks by&#160;real hackers and do&#160;not emulate complex hacking methods such as&#160;<span>phishing</span>, <span>lateral movement</span>, <span>privilege escalation</span> and <span>persistent presence in&#160;the system</span>.</div>
+    <div class="introduction-list">
+        <div class="introduction-list__item">
+            <div class="introduction-list__count">
+                <p>Doc.</p>
+            </div>
+            <div class="introduction-list__value">
+                <b data-counter>95%</b>
+                <p>{. of&#160;tested systems }</p>
+            </div>
+            <div class="introduction-list__text">had critical vulnerabilities</div>
+        </div>
+        <div class="introduction-list__item">
+            <div class="introduction-list__count">
+                <p>Doc.</p>
+            </div>
+            <div class="introduction-list__value">
+                <b data-counter>60%</b>
+                <p>{. of&#160;companies }</p>
+            </div>
+            <div class="introduction-list__text">fail to&#160;recover after a&#160;major cyberattack</div>
+        </div>
+        <div class="introduction-list__item">
+            <div class="introduction-list__count">
+                <p>Doc.</p>
+            </div>
+            <div class="introduction-list__value">
+                <b data-counter>207 days</b>
+            </div>
+            <div class="introduction-list__text">average time to&#160;detect a&#160;breach</div>
+        </div>
+    </div>
+</section>
+
+<section class="solution">
+    <div class="solution-container">
+        <div class="solution-screen">
+            <video preload playsinline autoplay loop muted class="solution-bg" lazy-video data-src="/video/solution-01.mp4"></video>
+            <div class="solution-content">
+                <span class="solution-label" animate-blur-text>THE SOLUTION</span>
+                <h2 class="title" animate-blur-text>Hidden Vulnerabilities Can Destroy You</h2>
+            </div>
+        </div>
+        <div class="solution-screen">
+            <video preload playsinline autoplay loop muted class="solution-bg" lazy-video data-src="/video/solution-02.mp4"></video>
+        </div>
+        <div class="solution-screen">
+            <video preload playsinline autoplay loop muted class="solution-bg" lazy-video data-src="/video/solution-03.mp4"></video>
+            <div class="solution-content">
+                <span class="solution-label" animate-blur-text>THE SOLUTION</span>
+                <h2 class="title" animate-blur-text>Security audits give you peace of&#160;mind</h2>
+            </div>
+        </div>
+        <div class="solution-screen problem">
+            <div class="problem-content">
+                <span class="problem-label">The problem</span>
+                <h2 class="problem-title">How do&#160;standard protection methods fall short?</h2>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="issue">
+    <div class="issue-item">
+        <video preload playsinline autoplay loop muted class="issue-item__bg" lazy-video data-src="/video/issue-01.mp4"></video>
+        <div class="issue-item__content">
+            <h2 class="issue-item__title">Compliance &#8800; Security</h2>
+            <p class="issue-item__text"> Completing a&#160;standard audit does not translate into concrete security.</p>
+        </div>
+        <div class="issue-item__label">Compliance &#8800; Security</div>
+    </div>
+    <div class="issue-item">
+        <video preload playsinline autoplay loop muted class="issue-item__bg" lazy-video data-src="/video/issue-02.mp4"></video>
+        <div class="issue-item__content">
+            <h2 class="issue-item__title">Limited pentests</h2>
+            <p class="issue-item__text">Most tests only check for obLimited pentestsvious vulnerabilities and do&#160;not simulate real attacks.</p>
+        </div>
+        <div class="issue-item__label">Limited pentests</div>
+    </div>
+    <div class="issue-item">
+        <video preload playsinline autoplay loop muted class="issue-item__bg" lazy-video data-src="/video/issue-03.mp4"></video>
+        <div class="issue-item__content">
+            <h2 class="issue-item__title">Real hackers use dynamic attacks</h2>
+            <p class="issue-item__text">Real hackers use dynamic attacks</p>
+        </div>
+        <div class="issue-item__label">Real hackers use dynamic attacks</div>
+    </div>
+</section>
+
+<section class="defeat">
+    <div class="defeat-body">
+        <div class="defeat-wrapper">
+            <video preload playsinline autoplay loop muted class="defeat-bg" lazy-video data-src="/video/defeat.mp4"></video>
+            <div class="defeat-content">
+                <div class="defeat-access" animate-blur-text>Access Denied:</div>
+                <h2 class="defeat-title" animate-blur-text>They said you were secure. But&#160;now you&#8217;re compromised</h2>
+                <p class="defeat-text" animate-blur-text>To&#160;defeat hackers, you need to&#160;think like hackers.</p>
+            </div>
+            <div class="defeat-notify">🔒 Access Denied: Document is&#160;secure. return False else: print (&#171;⚠️ Intrusion Detected! System lockdown initiated.&#187;) return False # The hack failed</div>
+        </div>
+    </div>
+</section>
+
+<div class="layout-title" data-layout="01">Solution</div>
+<div class="layout-title" data-layout="02">About</div>
+<div class="layout-title" data-layout="03">Technologies</div>
+<div class="layout-title" data-layout="04">Awards</div>
+
+<div class="layout-count" data-layout="01">01</div>
+<div class="layout-count" data-layout="02">02</div>
+<div class="layout-count" data-layout="03">03</div>
+<div class="layout-count" data-layout="04">04</div>
+
+<section class="hackfirst" data-layout="01">
+    <div class="layout-head">
+        <span>Solution</span>
+        <span>01</span>
+    </div>
+    <img src="/img/svg/logo-black-new.svg" alt="" animate-blur-el loading="lazy">
+    <p class="hackfirst-text" animate-blur-text>The ultimate solution to&#160;modern cyber threats</p>
+</section>
+
+<section class="about-video">
+    <video preload playsinline autoplay loop muted lazy-video data-src="/video/about-video-3.mp4"></video>
+</section>
+
+<section class="about" data-layout="02">
+    <div class="about-line">
+        <span>A</span>
+        <span>collective</span>
+        <span>of</span>
+        <span>the</span>
+        <span>best</span>
+        <span>independent</span>
+        <span>premium</span>
+        <span>publishers</span>
+    </div>
+    <div class="layout-head">
+        <span>About</span>
+        <span>02</span>
+    </div>
+    <div class="about-content">
+        <span class="about-label" animate-blur-text>Features & Technologies</span>
+        <h2 class="title-md" animate-blur-text><span>HackFirst team simulates such attacks in</span> controlled environments without disrupting your services</h2>
+        <p class="about-text" animate-blur-el>Capitalize Leveraging our proprietary AI-powered hacking tools, and deploying whole squadrons of&#160;over 10 elite ethical hackers working in&#160;unison&#160;&#8212; white hats with a&#160;black hat mindset.</p>
+    </div>
+    <div class="about-list">
+        <div class="about-list__item">
+            <span>VAPT</span>
+        </div>
+        <div class="about-list__item">
+            <span>Red Team</span>
+        </div>
+        <div class="about-list__item">
+            <span>Security Advisory</span>
+        </div>
+    </div>
+</section>
+
+<section class="technologies" data-layout="03">
+    <div class="technologies-wrapper">
+        <div class="technologies-separator">
+            <span></span>
+            <i></i>
+            <span></span>
+            <i></i>
+            <span></span>
+        </div>
+        <div class="layout-head">
+            <span>Technologies</span>
+            <span>03</span>
+        </div>
+        <div class="technologies-image"><span><video preload playsinline autoplay loop muted lazy-video data-src="/video/technologies.mp4"></video></span></div>
+        <div class="technologies-separator">
+            <span></span>
+            <i></i>
+            <span></span>
+            <i></i>
+            <span></span>
+        </div>
+    </div>
+    <div class="technologies-content">
+        <div class="technologies-item" animate-blur-el>
+            <h4>Realistic Threat Simulations</h4>
+            <p>Experience attacks modeled after real-world cybercriminals, testing defenses against tactics from groups like Double Dragon, Fancy Bear, and Lazarus Group</p>
+        </div>
+        <div class="technologies-item" animate-blur-el>
+            <h4>Safe & Controlled Testing</h4>
+            <p>Conduct simulations without disrupting operations, allowing focus on&#160;strengthening systems securely.</p>
+        </div>
+        <div class="technologies-item" animate-blur-el>
+            <h4>AI-Powered Hacking Tools</h4>
+            <p>Utilize advanced AI&#160;tools developed by&#160;HackFirst to&#160;emulate sophisticated cybercriminal strategies, uncovering vulnerabilities others miss.</p>
+        </div>
+        <div class="technologies-item" animate-blur-el>
+            <h4>World-Class Ethical Hackers</h4>
+            <p>Collaborate with a&#160;team of&#160;over 10 world-class ethical hackers who think like black-hat attackers and use their skills to&#160;protect your organization.</p>
+        </div>
+    </div>
+</section>
+
+<section class="awards" data-layout="04">
+    <div class="layout-head">
+        <span>Awards</span>
+        <span>04</span>
+    </div>
+    <p class="awards-text" animate-blur-text>Our team leads are ranked #1 in&#160;the Top Hackers Lists of&#160;the world&#8217;s leading crypto exchanges and platforms</p>
+    <div class="awards-grid">
+        <a href="#" class="awards-item awards-item-winner" animate-blur-el>
+            <div class="awards-item__logo"><img src="/img/awards-01.png" alt="" loading="lazy"></div>
+            <div class="awards-item__text">
+                <span>Ranked #1</span>
+                <p>Hall of&#160;Fame</p>
+            </div>
+        </a>
+        <a href="#" class="awards-item awards-item-winner" animate-blur-el>
+            <div class="awards-item__logo"><img src="/img/awards-02.png" alt="" loading="lazy"></div>
+            <div class="awards-item__text">
+                <span>Ranked #1</span>
+                <p>Top Hackers Lists</p>
+            </div>
+        </a>
+        <a href="#" class="awards-item awards-item-winner" animate-blur-el>
+            <div class="awards-item__logo"><img src="/img/awards-03.png" alt="" loading="lazy"></div>
+            <div class="awards-item__text">
+                <span>Ranked #1</span>
+                <p>Top Hackers Lists</p>
+            </div>
+        </a>
+        <a href="#" class="awards-item awards-item-winner" animate-blur-el>
+            <div class="awards-item__logo"><img src="/img/awards-04.png" alt="" loading="lazy"></div>
+            <div class="awards-item__text">
+                <span>Ranked #1</span>
+                <p>Top Hackers Lists</p>
+            </div>
+        </a>
+        <a href="#" class="awards-item awards-item-winner" animate-blur-el>
+            <div class="awards-item__logo"><img src="/img/awards-05.png" alt="" loading="lazy"></div>
+            <div class="awards-item__text">
+                <span>Ranked #1</span>
+                <p>Top Hackers Lists</p>
+            </div>
+        </a>
+        <a href="#" class="awards-item" animate-blur-el>
+            <div class="awards-item__logo"><img src="/img/awards-06.png" alt="" loading="lazy"></div>
+            <div class="awards-item__text">
+                <span>Ranked #2</span>
+                <p>Hall of&#160;Fame</p>
+            </div>
+        </a>
+        <a href="#" class="awards-item awards-item-winner" animate-blur-el>
+            <div class="awards-item__logo"><img src="/img/awards-07.png" alt="" loading="lazy"></div>
+            <div class="awards-item__text">
+                <span>Ranked #1</span>
+                <p>Top Hackers Lists</p>
+            </div>
+        </a>
+        <a href="#" class="awards-item" animate-blur-el>
+            <div class="awards-item__logo"><img src="/img/awards-08.png" alt="" loading="lazy"></div>
+            <div class="awards-item__text">
+                <span>Ranked #2</span>
+                <p>Top Hackers Lists</p>
+            </div>
+        </a>
+        <a href="#" class="awards-item awards-item-winner" animate-blur-el>
+            <div class="awards-item__logo"><img src="/img/awards-09.png" alt="" loading="lazy"></div>
+            <div class="awards-item__text">
+                <span>Ranked #1</span>
+                <p>Top Hackers Lists</p>
+            </div>
+        </a>
+    </div>
+    <div class="awards-separator">
+        <span></span>
+        <i></i>
+        <span></span>
+        <i></i>
+        <span></span>
+    </div>
+</section>
+
+<section class="started">
+    <video preload playsinline autoplay loop muted class="started-bg" lazy-video data-src="/video/started.mp4"></video>
+    <div class="started-content">
+        <span class="started-label" animate-blur-text>HackFirst is&#160;a&#160;proud member of&#160;the FearsOff Alliance</span>
+        <h2 class="title-md" animate-blur-text>Is&#160;your organization truly ready for a&#160;HackFirst level assault?</h2>
+        <p class="started-text" animate-blur-text>With HackFirst&#8482; Cyberattack Simulations, you&#8217;re not just checking the box on&#160;security&#160;&#8212; you&#8217;re forged in&#160;fire</p>
+        <a href="#" class="started-btn" animate-blur-el>Get started</a>
+    </div>
+</section>
+
+<footer class="footer">
+    <video preload playsinline autoplay loop muted class="footer-bg" lazy-video data-src="/video/footer.mp4"></video>
+    <div class="footer-row">
+        <div class="footer-col">
+            <img src="/img/svg/logo-new.svg" alt="" class="footer-logo" loading="lazy">
+        </div>
+        <div class="footer-col">
+            <div class="footer-about">
+                <span>about</span>
+                <p>HackFirst: Outsmarting Attackers. Securing Tomorrow.At HackFirst, we&#160;don&#8217;t just defend&#8212;we outsmart</p>
+            </div>
+        </div>
+    </div>
+    <div class="footer-row">
+        <div class="footer-col">
+            <div class="footer-nav">
+                <p>Socials</p>
+                <ul>
+                    <li><a href="#" class="hover-effect hover-effect--bg">Facebook</a></li>
+                    <li><a href="#" class="hover-effect hover-effect--bg">LinkedIn</a></li>
+                    <li><a href="#" class="hover-effect hover-effect--bg">X</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-col">
+            <div class="footer-nav">
+                <p>Navigation</p>
+                <ul>
+                    <li><a href="/" class="hover-effect hover-effect--bg">Home</a></li>
+                                       <li><a href="/services" class="hover-effect hover-effect--bg">Services</a></li>
+                                       <li><a href="/about" class="hover-effect hover-effect--bg">About</a></li>
+                                       <li><a href="/contacts" class="hover-effect hover-effect--bg">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <div class="footer-copyright">design by&#160;<a href="https://t.me/Cassy_dark" target="_blank" class="hover-effect hover-effect--bg">.cassari</a></div>
+    </div>
+</footer>
+
+<div class="scroll-progress">
+    <div class="scroll-progress__animate">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    <div class="scroll-progress__percent">0%</div>
+</div>
+
+        <script defer src="/js/libs.min.js?cb=1751366445799"></script>
+        <script defer src="/js/animate.js?cb=1751366445799"></script>
+        <script defer src="/js/main.min.js?cb=1751366445799"></script>
+    </body>
+</html>
