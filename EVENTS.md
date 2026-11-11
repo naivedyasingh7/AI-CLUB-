@@ -1,6 +1,6 @@
 # AI Club event archive
 
-Implemented on `feat/events-lanyard-experience`, based on the existing particle-loader work. The production website remains the static Vite page. This feature is a separate, lazy React island between Technologies and Members. The existing preloader, navigation, header, footer, and legacy scrolling scripts were not rewritten.
+Implemented on `feat/events-lanyard-experience`, based on the existing particle-loader work. The production website remains the static Vite page. This feature is a separate Events page at `/events.html`, linked beside Contact in the desktop, mobile and footer navigation. The home page does not mount or download the archive. The existing preloader, navigation, header, footer, and legacy scrolling scripts were not rewritten.
 
 ## What is included
 
@@ -19,7 +19,7 @@ npm run build
 npm run preview
 ```
 
-Scroll to the archive after Technologies, or open the local URL with `/#events`. No new site-wide smooth-scroll controller is installed.
+Choose Events in the top navigation, or open `/events.html` directly. No new site-wide smooth-scroll controller is installed.
 
 ## Edit event data (club head)
 
@@ -37,7 +37,9 @@ Lifecycle uses absolute instants: UPCOMING before the start, LIVE NOW between kn
 
 ## Architecture and changed files
 
-- `index.html`: only the new island host, initial anchor/loading message and module entry are added.
+- `index.html`: Events navigation links; no archive in the home-page scroll.
+- `events.html`, `src/events-page.css`: dedicated page, responsive navigation and archive host.
+- `vite.config.js`: explicit home and Events production HTML entries.
 - `src/events-entry.jsx`: imports the feature near the viewport, or immediately for an Events deep link. It never reads or resets the loader's session flag.
 - `src/data/events.js`: production content and field schema.
 - `src/components/events/eventModel.js`: date/status/calendar utilities, layout calculations, valid interaction transitions and all tunable configuration.
@@ -91,6 +93,7 @@ The main scene/physics pauses during details. The poster renderer draws only whe
 
 ## Actual verification
 
+- Dedicated-page follow-up: production navigation to `/events.html`, details, same-tab refresh without loader replay, and Contact back to the home page passed at 360/768/1440px. The full physics/shader flow also passed at 1440px. Home no longer contains an Events mount. The standalone page shares the existing once-per-session loader and has a responsive navigation row.
 - Lint: passed with zero warnings. Production build: passed, with the lazy-chunk size warning noted above.
 - Six Node tests passed for lifecycle/offsets, invalid dates, UTC calendar folding/escaping, reducer transitions and layout/URL behavior.
 - Automated Chrome with software WebGL: full select → physics → shader details → Escape → return flow passed at 360, 390, 768, 1024 and 1440px and an 844×390 landscape viewport. No page JavaScript errors; modal focus stayed contained and scrolling was restored.

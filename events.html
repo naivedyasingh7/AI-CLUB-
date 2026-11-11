@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Explore the AI Club event archive at VIT Bhopal." />
+    <title>Events — AI Club · VIT Bhopal</title>
+    <link rel="stylesheet" href="/css/libs.min.css" />
+    <link rel="stylesheet" href="/css/main.min.css" />
+    <link rel="stylesheet" href="/src/events-page.css" />
+    <link rel="icon" type="image/png" href="/img/favicon.png" />
+  </head>
+  <body class="events-page">
+    <a class="events-skip" href="#events">Skip to events</a>
+    <header class="events-page-header">
+      <a href="/" aria-label="AI Club home"><img src="/img/svg/ai-club-logo-white.svg" alt="AI CLUB" /></a>
+      <nav aria-label="Main navigation">
+        <a href="/">Home</a>
+        <a href="/#services">Services</a>
+        <a href="/#about">About</a>
+        <a href="/#contacts">Contact</a>
+        <a href="/events.html" aria-current="page">Events</a>
+      </nav>
+    </header>
+    <div id="loader-root"></div>
+    <main id="events-root" style="min-height:850px">
+      <span id="events" aria-hidden="true"></span>
+      <p data-events-loading>The event archive · Details to be announced.</p>
+    </main>
+    <noscript><p>JavaScript is needed for the interactive archive. Event details have not been announced yet. <a href="/">Return home</a>.</p></noscript>
+    <script defer src="/js/libs.min.js"></script>
+    <script type="module" src="/src/loader-entry.jsx"></script>
+    <script type="module" src="/src/events-entry.jsx"></script>
+  </body>
+</html>
