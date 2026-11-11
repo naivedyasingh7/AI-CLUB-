@@ -19,22 +19,26 @@
  * @property {Array<{time:string,title:string}>=} agenda
  * @property {'open'|'closed'|'unannounced'=} registrationState
  * @property {string=} registrationUrl
+ * @property {string=} joinUrl Explicit live participation URL.
  * @property {string=} externalUrl
  * @property {{url?:string,images?:string[],highlights?:string[],statistics?:Array<{label:string,value:string}>}=} recap
  * @property {string[]=} highlights
  */
 
 /** @type {ClubEvent[]} No confirmed event details/assets have been supplied. Replace this preview before announcing. */
-export const events = [{
-  id: 'development-preview',
-  title: 'The next chapter.',
-  tagline: 'A place for what comes next.',
-  description: 'This is a development preview of the AI Club event archive. The club has not supplied an event announcement yet. The title, artwork and pass are placeholders; date, venue and registration will appear here when confirmed.',
-  development: true,
-  start: null,
-  end: null,
-  timeZone: 'Asia/Kolkata',
-  poster: '/img/events/archive-preview.svg',
-  community: 'AI Club · VIT Bhopal',
-  registrationState: 'unannounced',
-}];
+export const events = [
+  {
+    id: "development-preview",
+    title: "The next chapter.",
+    tagline: "A place for what comes next.",
+    description:
+      "This is a development preview of the AI Club event archive. The club has not supplied an event announcement yet. The title, artwork and pass are placeholders; date, venue and registration will appear here when confirmed.",
+    development: true,
+    start: null,
+    end: null,
+    timeZone: "Asia/Kolkata",
+    poster: "/img/events/archive-preview.svg",
+    community: "AI Club · VIT Bhopal",
+    registrationState: "unannounced",
+  },
+];
