@@ -1,5 +1,4 @@
 import React from 'react';
-import CyberCanvas from '../components/Canvases/CyberCanvas';
 
 export default function AboutPage() {
   const edges = [

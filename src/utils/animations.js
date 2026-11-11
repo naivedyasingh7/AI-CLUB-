@@ -114,7 +114,7 @@ export function initGlobalAnimations() {
           }
         );
       }
-    } catch (e) {}
+    } catch { /* Leave unsplittable text visible. */ }
   });
 
   document.querySelectorAll('[animate-blur-el]').forEach((el) => {

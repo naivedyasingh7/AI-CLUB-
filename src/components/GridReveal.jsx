@@ -10,29 +10,18 @@ export const GridReveal = ({ children, blockSize = 100, baseDelay = 200 }) => {
   useEffect(() => {
     const updateDimensions = () => {
       if (containerRef.current) {
-        setDimensions({
-          width: containerRef.current.offsetWidth,
-          height: containerRef.current.offsetHeight,
-        });
+        const width = containerRef.current.offsetWidth;
+        const height = containerRef.current.offsetHeight;
+        setDimensions({ width, height });
+        const totalBlocks = Math.ceil(width / blockSize) * Math.ceil(height / blockSize);
+        setDelays(Array.from({ length: totalBlocks }, () => Math.random() * 800));
       }
     };
 
     updateDimensions();
     window.addEventListener("resize", updateDimensions);
     return () => window.removeEventListener("resize", updateDimensions);
-  }, []);
-
-  useEffect(() => {
-    if (dimensions.width === 0 || dimensions.height === 0) return;
-
-    const cols = Math.ceil(dimensions.width / blockSize);
-    const rows = Math.ceil(dimensions.height / blockSize);
-    const totalBlocks = cols * rows;
-    
-    // Generate random delays for a staggered/glitch reveal
-    const newDelays = Array.from({ length: totalBlocks }).map(() => Math.random() * 800);
-    setDelays(newDelays);
-  }, [dimensions, blockSize]);
+  }, [blockSize]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

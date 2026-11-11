@@ -192,3 +192,5 @@ class TextAnimator {
 		gsap.set(this.textElement, { '--anim': 0 });
 	}
 }
+// Used by the separate classic page-animation bundle.
+window.TextAnimator = TextAnimator;
