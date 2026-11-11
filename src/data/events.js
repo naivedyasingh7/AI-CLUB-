@@ -38,6 +38,8 @@ export const events = [
     end: null,
     timeZone: "Asia/Kolkata",
     poster: "/img/events/archive-preview.svg",
+    badgeFront: "/img/events/badge-preview.svg",
+    badgeBack: "/img/events/badge-preview.svg",
     community: "AI Club · VIT Bhopal",
     registrationState: "unannounced",
   },
