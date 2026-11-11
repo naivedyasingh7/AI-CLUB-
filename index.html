@@ -5,12 +5,8 @@
         <meta name="language" content="English">
         <meta name="format-detection" content="telephone=no">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>AI CLUB - VIT BHOPAL</title>
-        <script>
-            const meta = document.querySelector('meta[name="viewport"]');
-            meta.setAttribute('content', `user-scalable=no, width=${screen.width <= 420 ? 420 : 'device-width'}`);
-        </script>
         <link rel="stylesheet" href="/css/libs.min.css?cb=1751366445799">
         <link rel="stylesheet" href="/css/main.min.css?cb=1751366445799">
         <link rel="icon" type="image/png" href="/img/favicon.png">
@@ -30,15 +26,15 @@
 
         <header class="header header-home">
     <div class="header-logo">
-        <a href="/">
+        <a href="#home">
             <img src="/img/svg/ai-club-logo-white.svg" alt="AI CLUB">
         </a>
     </div>
     <ul class="header-nav">
-        <li><a href="/" class="hover-effect hover-effect--bg">Home</a></li>
-               <li><a href="/services" class="hover-effect hover-effect--bg">Services</a></li>
-               <li><a href="/about" class="hover-effect hover-effect--bg">About</a></li>
-               <li><a href="/contacts" class="hover-effect hover-effect--bg">Contact</a></li>
+        <li><a href="#home" class="hover-effect hover-effect--bg">Home</a></li>
+               <li><a href="#services" class="hover-effect hover-effect--bg">Services</a></li>
+               <li><a href="#about" class="hover-effect hover-effect--bg">About</a></li>
+               <li><a href="#contacts" class="hover-effect hover-effect--bg">Contact</a></li>
     </ul>
     <div class="header-burger js-open-menu"></div>
 </header>
@@ -55,10 +51,10 @@
             </div>
             <div class="menu-content">
                 <ul class="menu-nav">
-                    <li data-video="https://hackfirst.io/video/menu-01.mp4"><a href="/">Home</a></li>
-                                       <li data-video="https://hackfirst.io/video/menu-02.mp4"><a href="/services">Services</a></li>
-                                       <li data-video="https://hackfirst.io/video/menu-03.mp4"><a href="/about">About</a></li>
-                                       <li data-video="https://hackfirst.io/video/menu-04.mp4"><a href="/contacts">Contact</a></li>
+                    <li data-video="https://hackfirst.io/video/menu-01.mp4"><a href="#home">Home</a></li>
+                                       <li data-video="https://hackfirst.io/video/menu-02.mp4"><a href="#services">Services</a></li>
+                                       <li data-video="https://hackfirst.io/video/menu-03.mp4"><a href="#about">About</a></li>
+                                       <li data-video="https://hackfirst.io/video/menu-04.mp4"><a href="#contacts">Contact</a></li>
                 </ul>
             </div>
         </div>
@@ -82,54 +78,10 @@
     </div>
 </div>
 
-<!-- loader -->
-<div class="loader">
-    <video preload playsinline autoplay loop muted class="loader-bg">
-        <source src="https://hackfirst.io/video/loader.mp4" type="video/mp4">
-    </video>
-    <div class="loader-dots"><span></span><span></span><span></span><span></span></div>
-    <img src="/img/svg/loader-circle-1.svg" alt="" class="loader-circle-1">
-    <img src="/img/svg/loader-circle-2.svg" alt="" class="loader-circle-2">
-    <div class="loader-count">
-        <div id="i" class="odometer">00</div>
-        <div class="loader-percent">%</div>
-    </div>
-    <div class="loader-utc">UTC +00:00</div>
-    <div class="loader-time">00:00:00</div>
-    <div class="loader-text" animate-blur-text data-instant>AI Club: Innovating the future. Mastering Technology. At AI Club, we believe that building is the best learning</div>
-</div>
+<div id="loader-root"></div>
+<script type="module" src="/src/loader-entry.jsx"></script>
 
-<script>
-	const loaderUTC = document.querySelector('.loader-utc');
-	const loaderTime = document.querySelector('.loader-time');
-
-	function updateTime() {
-		const now = new Date();
-
-		const timeStr = now.toLocaleTimeString('en-GB', {
-			hour12: false,
-			hour: '2-digit',
-			minute: '2-digit',
-			second: '2-digit'
-		});
-
-		const offset = now.getTimezoneOffset();
-		const absOffset = Math.abs(offset);
-		const hours = String(Math.floor(absOffset / 60)).padStart(2, '0');
-		const minutes = String(absOffset % 60).padStart(2, '0');
-		const sign = offset <= 0 ? '+' : '-';
-		const utcStr = `UTC ${sign}${hours}:${minutes}`;
-
-		loaderUTC.innerHTML = utcStr;
-		loaderTime.innerHTML = timeStr;
-	}
-
-	updateTime();
-	setInterval(updateTime, 1000);
-</script>
-<!-- end loader -->
-
-<section class="hero">
+<section id="home" class="hero">
     <video preload playsinline autoplay loop muted class="hero-bg">
         <source src="https://hackfirst.io/video/tornado-home.mp4" type="video/mp4">
     </video>
@@ -179,7 +131,7 @@
     </div>
 </section>
 
-<section class="solution">
+<section id="services" class="solution">
     <div class="solution-container">
         <div class="solution-screen">
             <video preload playsinline autoplay loop muted class="solution-bg" lazy-video data-src="https://hackfirst.io/video/solution-01.mp4"></video>
@@ -271,7 +223,7 @@
     <video preload playsinline autoplay loop muted lazy-video data-src="https://hackfirst.io/video/about-video-3.mp4"></video>
 </section>
 
-<section class="about" data-layout="02">
+<section id="about" class="about" data-layout="02">
     <div class="about-line">
         <span>A</span>
         <span>community</span>
@@ -490,11 +442,11 @@
         <span class="started-label" animate-blur-text>AI Club is the premier technical community</span>
         <h2 class="title-md" animate-blur-text>Are you truly ready to build the future of AI?</h2>
         <p class="started-text" animate-blur-text>With AI Club's intensive research groups, you're not just learning theory — you're building reality</p>
-        <a href="#" class="started-btn" animate-blur-el>Get started</a>
+        <a href="#contacts" class="started-btn" animate-blur-el>Get started</a>
     </div>
 </section>
 
-<footer class="footer">
+<footer id="contacts" class="footer">
     <video preload playsinline autoplay loop muted class="footer-bg" lazy-video data-src="https://hackfirst.io/video/footer.mp4"></video>
     <div class="footer-row">
         <div class="footer-col">
@@ -522,10 +474,10 @@
             <div class="footer-nav">
                 <p>Navigation</p>
                 <ul>
-                    <li><a href="/" class="hover-effect hover-effect--bg">Home</a></li>
-                                       <li><a href="/services" class="hover-effect hover-effect--bg">Services</a></li>
-                                       <li><a href="/about" class="hover-effect hover-effect--bg">About</a></li>
-                                       <li><a href="/contacts" class="hover-effect hover-effect--bg">Contact</a></li>
+                    <li><a href="#home" class="hover-effect hover-effect--bg">Home</a></li>
+                                       <li><a href="#services" class="hover-effect hover-effect--bg">Services</a></li>
+                                       <li><a href="#about" class="hover-effect hover-effect--bg">About</a></li>
+                                       <li><a href="#contacts" class="hover-effect hover-effect--bg">Contact</a></li>
                 </ul>
             </div>
         </div>

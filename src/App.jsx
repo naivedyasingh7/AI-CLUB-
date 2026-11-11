@@ -12,11 +12,19 @@ import AboutPage from './pages/AboutPage';
 import ContactsPage from './pages/ContactsPage';
 
 import { initGlobalAnimations } from './utils/animations';
+import { hasLoaderPlayed } from './utils/loaderSession';
+import { installNavigation } from './utils/navigation';
 
 export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => !hasLoaderPlayed());
+  const [entranceReady, setEntranceReady] = useState(hasLoaderPlayed);
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
+
+  useEffect(() => installNavigation({ onRoute: path => {
+    setMenuOpen(false);
+    setCurrentPath(path);
+  } }), []);
 
   useEffect(() => {
     const onPopState = () => setCurrentPath(window.location.pathname);
@@ -25,12 +33,10 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (!loading) {
-      setTimeout(() => {
-        initGlobalAnimations();
-      }, 100);
+    if (entranceReady) {
+      initGlobalAnimations();
     }
-  }, [loading, currentPath]);
+  }, [entranceReady, currentPath]);
 
   const renderPage = () => {
     switch (currentPath) {
@@ -47,7 +53,7 @@ export default function App() {
 
   return (
     <div className="wrapper bg-black text-[#E9F7FC] min-h-screen relative">
-      {loading && <Loader onComplete={() => setLoading(false)} />}
+      {loading && <Loader onBurst={() => setEntranceReady(true)} onComplete={() => setLoading(false)} />}
 
       <Header onOpenMenu={() => setMenuOpen(true)} isHome={currentPath === '/'} />
       <Menu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
