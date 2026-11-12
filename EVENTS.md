@@ -1,5 +1,8 @@
 # AI Club event archive
 
+> Current implementation: [EVENTS_PHASE2.md](EVENTS_PHASE2.md). The notes below
+> describe the earlier archive; the old full-screen details overlay is removed.
+
 > Current phase: the horizontal gallery on `feat/events-lanyard-gallery` supersedes
 > the hero selection/physics flow described below. See [EVENTS_GALLERY.md](EVENTS_GALLERY.md)
 > for current controls, reference defaults, changed files and verification. The

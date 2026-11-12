@@ -1,5 +1,8 @@
 # Horizontal lanyard gallery — phase 1
 
+Historical Phase 1 notes. See [EVENTS_PHASE2.md](EVENTS_PHASE2.md) for the current
+focus, physics and details flow and its verification.
+
 Branch: `feat/events-lanyard-gallery`. Open `/events.html`. The dedicated page now
 contains a horizontally browsable archive, reusing the existing local GLB,
 laminated shell, hardware, artwork, woven fabric and product lighting.
