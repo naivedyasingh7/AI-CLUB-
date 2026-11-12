@@ -18,6 +18,7 @@ export const HANDOFF_RENDER_DELAY = 0.05;
 export const GALLERY_RESTORE_DURATION = 0.75;
 export const FOCUS_EASE = "power2.inOut";
 export const PANEL_BADGE_X = 0.26;
+export const PANEL_WIDE_BREAKPOINT = 1280;
 export const MOBILE_BREAKPOINT = 768;
 export const MOBILE_PANEL_ZOOM = 0.62;
 export const MOBILE_BADGE_Y = 0.18;
@@ -40,14 +41,21 @@ export const EMPTY_CLICK_SLOP = 8;
 // Give GSAP a completion tick when every visual duration is zero.
 export const REDUCED_TRANSITION_TICK = 0.001;
 
-export function panelCarrier(camera, progress, mobile) {
+export function panelCarrier(
+  camera,
+  progress,
+  mobile,
+  focusX = PANEL_BADGE_X,
+  faceDepth = 0,
+) {
   const height =
-    (2 * Math.tan((camera.fov * Math.PI) / 360) * camera.position.z) /
-    camera.zoom;
+    ((2 * Math.tan((camera.fov * Math.PI) / 360) * camera.position.z) /
+      camera.zoom) *
+    (1 - faceDepth / camera.position.z);
   return {
     x: mobile
       ? 0
-      : (PANEL_SIDE === "right" ? PANEL_BADGE_X - 0.5 : 0.5 - PANEL_BADGE_X) *
+      : (PANEL_SIDE === "right" ? focusX - 0.5 : 0.5 - focusX) *
         height *
         camera.aspect *
         progress,

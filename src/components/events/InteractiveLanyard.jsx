@@ -41,6 +41,7 @@ import {
   JOINT_FOLLOW_MIN,
   JOINT_FOLLOW_MAX,
   panelCarrier,
+  PANEL_WIDE_BREAKPOINT,
 } from "./focusConfig";
 import { STRAP_ACCENT_MIX } from "./galleryConfig";
 function FocusRig({
@@ -158,7 +159,16 @@ function FocusRig({
   }, [math, pose, onReady, onDispose]);
   useBeforePhysicsStep(() => {
     if (!body.current) return;
-    const target = panelCarrier(camera, visual.current.panel, mobile),
+    // Centre the rendered face, accounting for its perspective depth, without altering swing.
+    badge.current.updateWorldMatrix(true, false);
+    badge.current.localToWorld(math.position.set(0, -0.11, 0.11));
+    const target = panelCarrier(
+        camera,
+        visual.current.panel,
+        mobile,
+        visual.current.focusX,
+        innerWidth >= PANEL_WIDE_BREAKPOINT ? math.position.z : 0,
+      ),
       dx = target.x - carrier.current.x,
       dy = target.y - carrier.current.y;
     if (dx || dy) {

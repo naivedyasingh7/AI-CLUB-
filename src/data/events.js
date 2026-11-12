@@ -10,9 +10,7 @@ export const eventCopy = {
   speakers: "Speakers",
   register: "Register ↗",
   registerPending: "Register · TBA",
-  calendar: "Add to calendar",
-  calendarPending: "Add to calendar · TBA",
-  previewActions: "Preview · booking and calendar unavailable",
+  previewActions: "Preview · registration unavailable",
 };
 
 /**

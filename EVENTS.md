@@ -41,7 +41,7 @@ Edit `src/data/events.js`. It contains the full JSDoc field schema and the only 
 6. Add optional `speakers`, `judges`, `agenda`, and `highlights` only when confirmed. For past events, `recap` can contain a URL, images, highlights and labelled statistics; missing sections are omitted.
 7. Add additional array entries to create more passes. There are no hardcoded event-specific scene positions.
 
-Lifecycle uses absolute instants: UPCOMING before the start, LIVE NOW between known start/end, PAST after the end. Invalid or impossible dates get a confirmation fallback. A known start without an end supports an upcoming countdown, but does not invent an ending or live status. Calendar download is available only with valid start and end; the generated ICS uses UTC instants, escapes fields and folds UTF-8 lines.
+Lifecycle uses absolute instants: UPCOMING before the start, LIVE NOW between known start/end, PAST after the end. Invalid or impossible dates get a confirmation fallback. A known start without an end supports an upcoming countdown, but does not invent an ending or live status.
 
 ## Architecture and changed files
 
@@ -50,15 +50,15 @@ Lifecycle uses absolute instants: UPCOMING before the start, LIVE NOW between kn
 - `vite.config.js`: explicit home and Events production HTML entries.
 - `src/events-entry.jsx`: imports the feature near the viewport, or immediately for an Events deep link. It never reads or resets the loader's session flag.
 - `src/data/events.js`: production content and field schema.
-- `src/components/events/eventModel.js`: date/status/calendar utilities, layout calculations, valid interaction transitions and all tunable configuration.
+- `src/components/events/eventModel.js`: date/status utilities, layout calculations, valid interaction transitions and all tunable configuration.
 - `EventsSection.jsx`: equivalent HTML event selection, explicit browsing, owned ScrollTrigger, viewport/reduced-motion observers, renderer fallback and interaction state.
 - `EventsScene.jsx`: viewport/FOV-based hero framing, local Lightformer environment, small single-pass anchor, multi-event rail, camera continuity and adaptive DPR.
 - `EventBadge.jsx`: `useGLTF` model, independently replaceable front/back artwork, sRGB/anisotropic filtering, PBR materials and per-instance material cleanup.
 - `InteractiveLanyard.jsx`: lazy Rapier world, fixed anchor, three rope joints, one spherical joint, badge body, textured MeshLine fabric band, pointer capture and keyboard impulses.
-- `EventDetailPanel.jsx`: native modal dialog, focus loop, Escape/close, lifecycle content, countdown, configured actions and calendar.
+- `EventDetailPanel.jsx`: native modal dialog, focus loop, Escape/close, lifecycle content, countdown, configured actions.
 - `PixelReveal.jsx`: owned shader renderer, original image sampling/reconstruction effect, resize and GPU cleanup; ordinary image fallback remains underneath.
 - `events.css`: styles scoped to the event archive/dialog and existing palette/typeface names.
-- `eventModel.test.js`: six Node tests for lifecycle boundaries, invalid dates, calendar output, layout, URLs and valid/invalid transition sequences.
+- `eventModel.test.js`: six Node tests for lifecycle boundaries, invalid dates, layout, URLs and valid/invalid transition sequences.
 - `public/img/events/archive-preview.svg`, `archive-fallback.svg`: labelled development artwork and a generic missing-artwork fallback containing the existing logo, not an invented logo.
 - `public/models/events/ai-club-pass.glb`, `fabric.svg`, `ASSETS.md`: original self-hosted geometry, woven pattern and asset provenance.
 - `scripts/build-event-badge.mjs`: editable/reproducible GLB source.
@@ -126,11 +126,11 @@ The production hero was exercised in Chrome/SwiftShader at 360×800, 390×844, 7
 
 - Dedicated-page follow-up: production navigation to `/events.html`, details, same-tab refresh without loader replay, and Contact back to the home page passed at 360/768/1440px. The full physics/shader flow also passed at 1440px. Home no longer contains an Events mount. The standalone page shares the existing once-per-session loader and has a responsive navigation row.
 - Lint: passed with zero warnings. Production build: passed, with the lazy-chunk size warning noted above.
-- Six Node tests passed for lifecycle/offsets, invalid dates, UTC calendar folding/escaping, reducer transitions and layout/URL behavior.
+- Six Node tests passed for lifecycle/offsets, invalid dates, reducer transitions and layout/URL behavior.
 - Automated Chrome with software WebGL: full select → physics → shader details → Escape → return flow passed at 360, 390, 768, 1024 and 1440px and an 844×390 landscape viewport. No page JavaScript errors; modal focus stayed contained and scrolling was restored.
 - DPR=3 at 360px was capped to 1.5. Slow software-rendered contexts adapted down to DPR=1. These are not physical-device FPS benchmarks.
 - Reduced motion had no drag surface and retained working details. Unavailable WebGL, context loss during initialization and a missing poster retained usable HTML/details.
-- Isolated synthetic fixtures (not production announcements): empty, one, two and six entries; no pin for zero/one/two and a working pin for six; scroll rotation; correct selected event; actual configured registration URL and ICS link; three Strict Mode unmount/remount cycles with no page errors and no remaining owned trigger/canvas.
+- Isolated synthetic fixtures (not production announcements): empty, one, two and six entries; no pin for zero/one/two and a working pin for six; scroll rotation; correct selected event; actual configured registration URL; three Strict Mode unmount/remount cycles with no page errors and no remaining owned trigger/canvas.
 - Emulated native touch drag, touch cancellation, restored ordinary vertical scrolling and touch-close of the detail dialog passed. A visual-viewport fit keeps the close button visible even when legacy page content makes the layout viewport wider than the phone screen.
 - Rapid clicks, selection cancellation, closing during opening, unchanged legacy trigger count, and actual movement of the existing horizontal Members section passed.
 - Clicking the actual WebGL badge (raycast selection) reached one interactive pass without page errors. The desktop pin was also checked with the selected-event controls remaining inside the stage.

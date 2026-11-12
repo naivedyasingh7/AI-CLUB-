@@ -7,9 +7,11 @@ import {
 } from "react";
 import SplitType from "split-type";
 import { eventCopy } from "../../data/events";
-import { calendarText, eventDateLabel, safeEventUrl } from "./eventModel";
+import { eventDateLabel, safeEventUrl } from "./eventModel";
 import {
   PANEL_SIDE,
+  PANEL_BADGE_X,
+  PANEL_WIDE_BREAKPOINT,
   PANEL_REVEAL_DURATION,
   PANEL_EXIT_DURATION,
   PANEL_TEXT_STAGGER,
@@ -30,8 +32,7 @@ export default function FocusDetailsPanel({
   const panel = useRef(null),
     copy = useRef(null),
     close = useRef(null),
-    lines = useRef([]),
-    calendarLink = useRef(null);
+    lines = useRef([]);
   const normalized = useMemo(
     () => ({
       ...event,
@@ -40,15 +41,6 @@ export default function FocusDetailsPanel({
     }),
     [event],
   );
-  const calendar = useMemo(() => calendarText(normalized), [normalized]);
-  useEffect(() => {
-    if (!calendar) return;
-    const url = URL.createObjectURL(
-      new Blob([calendar], { type: "text/calendar;charset=utf-8" }),
-    );
-    if (calendarLink.current) calendarLink.current.href = url;
-    return () => URL.revokeObjectURL(url);
-  }, [calendar]);
   useLayoutEffect(() => {
     const split = new SplitType(
       copy.current.querySelectorAll("[data-panel-reveal]"),
@@ -93,6 +85,12 @@ export default function FocusDetailsPanel({
   useImperativeHandle(
     ref,
     () => ({
+      focusX() {
+        const element = panel.current;
+        return innerWidth >= PANEL_WIDE_BREAKPOINT
+          ? element.offsetLeft / (2 * element.offsetParent.clientWidth)
+          : PANEL_BADGE_X;
+      },
       enter(timeline, at = 0) {
         // Hand off the single visible Close control when the panel starts revealing.
         timeline.set(externalClose.current, { autoAlpha: 0 }, at);
@@ -243,13 +241,6 @@ export default function FocusDetailsPanel({
           </a>
         ) : (
           <button disabled>{eventCopy.registerPending}</button>
-        )}
-        {!placeholder && calendar ? (
-          <a ref={calendarLink} download={`${event.id}.ics`}>
-            {eventCopy.calendar}
-          </a>
-        ) : (
-          <button disabled>{eventCopy.calendarPending}</button>
         )}
         {placeholder && <small>{eventCopy.previewActions}</small>}
       </footer>

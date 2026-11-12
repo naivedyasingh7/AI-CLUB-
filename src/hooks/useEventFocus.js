@@ -21,6 +21,7 @@ import {
   FOCUS_EASE,
   REDUCED_TRANSITION_TICK,
   PIXEL_RESOLVE_DURATION,
+  PANEL_BADGE_X,
 } from "../components/events/focusConfig";
 
 const initial = {
@@ -43,7 +44,13 @@ export function useEventFocus({
   const [focus, setFocus] = useState(initial),
     [dragging, setDragging] = useState(false);
   const state = useRef(initial),
-    visual = useRef({ focus: 0, panel: 0, blend: 1, pixel: 1 }),
+    visual = useRef({
+      focus: 0,
+      panel: 0,
+      blend: 1,
+      pixel: 1,
+      focusX: PANEL_BADGE_X,
+    }),
     saved = useRef(null),
     rig = useRef(null),
     ready = useRef(false),
@@ -69,6 +76,16 @@ export function useEventFocus({
       rig.current = null;
     };
   }, [viewport]);
+  useLayoutEffect(() => {
+    if (!focus.panelMounted) return;
+    const measure = () => {
+      visual.current.focusX = panel.current?.focusX() ?? PANEL_BADGE_X;
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(viewport.current);
+    return () => observer.disconnect();
+  }, [focus.panelMounted, viewport]);
   useEffect(() => {
     let cancelled = false;
     preloadFocusPhysics()

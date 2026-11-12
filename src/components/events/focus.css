@@ -1,6 +1,13 @@
+.lanyard-gallery {
+  --events-edge: 32px;
+  --events-edge-inset: max(0px, calc(var(--events-edge) - (100vw - 100%)));
+  --events-hud-top: 12px;
+}
 .gallery-heading {
   --hud-height: 36px;
-  top: 12px;
+  top: var(--events-hud-top);
+  left: var(--events-edge);
+  right: var(--events-edge-inset);
   align-items: center;
 }
 .gallery-heading h1,
@@ -23,8 +30,8 @@
 }
 .gallery-focus-close {
   position: absolute;
-  right: 32px;
-  top: 12px;
+  right: var(--events-edge-inset);
+  top: var(--events-hud-top);
   z-index: 12;
   height: 36px;
   padding: 0 14px;
@@ -132,8 +139,8 @@
 }
 .focus-panel {
   position: absolute;
-  right: 24px;
-  top: 11px;
+  right: var(--events-edge-inset);
+  top: var(--events-hud-top);
   bottom: 24px;
   width: min(44%, 620px);
   z-index: 20;
@@ -171,6 +178,8 @@
   letter-spacing: 0.06em;
 }
 .focus-panel-bar button {
+  position: relative;
+  top: -1px;
   flex: none;
   display: inline-flex;
   align-items: center;
@@ -316,7 +325,7 @@
 }
 .focus-panel-actions small {
   flex-basis: 100%;
-  font: 10px/1.4 monospace;
+  font: 11px/1.4 monospace;
   color: color-mix(in srgb, var(--color-text) 70%, var(--color-bg));
 }
 @media (min-width: 768px) and (max-width: 1000px) {
@@ -341,12 +350,16 @@
   }
 }
 @media (max-width: 767px) {
+  .lanyard-gallery {
+    --events-edge: 20px;
+    --events-hud-top: 18px;
+  }
   .gallery-heading {
     top: 18px;
   }
   .gallery-focus-close {
-    right: 20px;
-    top: 18px;
+    right: var(--events-edge-inset);
+    top: var(--events-hud-top);
   }
   .lanyard-gallery:not([data-focus-state="BROWSING"]) .gallery-heading {
     right: 128px;
@@ -355,9 +368,9 @@
     position: fixed;
     top: auto;
     bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
+    left: var(--events-edge);
+    right: var(--events-edge-inset);
+    width: auto;
     height: 54svh;
     max-height: 54svh;
     border-radius: 16px 16px 0 0;

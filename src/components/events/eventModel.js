@@ -113,55 +113,6 @@ export function safeEventUrl(url) {
     return null;
   }
 }
-export function calendarText(event) {
-  const dates = eventTimes(event);
-  if (!dates || dates.end === null || event.development) return null;
-  const escape = (value) =>
-    String(value || "")
-      .replace(/\\/g, "\\\\")
-      .replace(/\r\n|\r|\n/g, "\\n")
-      .replace(/,/g, "\\,")
-      .replace(/;/g, "\\;");
-  const utc = (ms) =>
-    new Date(ms)
-      .toISOString()
-      .replace(/[-:]/g, "")
-      .replace(/\.\d{3}/, "");
-  const lines = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//AI Club VIT Bhopal//Events//EN",
-    "BEGIN:VEVENT",
-    `UID:${escape(event.id)}@aiclub.vitbhopal`,
-    `DTSTAMP:${utc(Date.now())}`,
-    `DTSTART:${utc(dates.start)}`,
-    `DTEND:${utc(dates.end)}`,
-    `SUMMARY:${escape(event.title)}`,
-    `DESCRIPTION:${escape(event.description)}`,
-    `LOCATION:${escape(event.venue || event.mode || "")}`,
-    "END:VEVENT",
-    "END:VCALENDAR",
-  ];
-  // RFC 5545 line folding at UTF-8 byte boundaries, not JavaScript character counts.
-  return (
-    lines
-      .map((line) => {
-        let folded = "",
-          length = 0;
-        for (const char of line) {
-          const bytes = new TextEncoder().encode(char).length;
-          if (length + bytes > 73) {
-            folded += "\r\n ";
-            length = 1;
-          }
-          folded += char;
-          length += bytes;
-        }
-        return folded;
-      })
-      .join("\r\n") + "\r\n"
-  );
-}
 export const TRANSITIONS = {
   BROWSING: { SELECT: "SELECTING" },
   SELECTING: { SETTLED: "INTERACTIVE", CANCEL: "RETURNING" },

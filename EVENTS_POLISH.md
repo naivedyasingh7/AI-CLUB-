@@ -53,7 +53,7 @@ are unchanged. Pixel block size/duration remain named constants at the top of
 
 - `npm run lint`: passes without warnings.
 - `npm run build`: passes; Vite retains its existing large-chunk advisory.
-- 12 Node tests covering event/calendar validation, gallery/dummy logic and focus
+- 12 Node tests covering event/date validation, gallery/dummy logic and focus
   placement pass.
 - Headless Windows Chrome with software WebGL: 360×844, 768×1000, 1440×900,
   1366×768 and 1280×720, using the six-pass development gallery. All checked action

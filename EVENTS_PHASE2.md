@@ -22,7 +22,7 @@ never mount a Physics provider. The loader and its session flag are unchanged.
 | `src/components/events/InteractiveLanyard.jsx` | Exact-pose activation, offset-preserving drag, rope bounds, keyboard impulses and teardown |
 | `src/components/events/EventsScene.jsx` | Pose capture, dimming, panel framing and physical-to-static closing blend |
 | `src/components/events/EventsSection.jsx` | Focus controls, grip, connector and panel integration |
-| `src/components/events/FocusDetailsPanel.jsx` | SplitType reveal, existing PixelReveal, focus trap, field fallbacks, registration and ICS |
+| `src/components/events/FocusDetailsPanel.jsx` | SplitType reveal, existing PixelReveal, focus trap, field fallbacks, registration |
 | `src/components/events/focus.css` | Focus controls, desktop panel/mobile sheet, readable breadcrumb/counter backgrounds |
 | `src/hooks/useSmoothHorizontalScroll.js` | Focus input lock and delayed pointer capture to distinguish touch taps/swipes |
 | `src/components/events/galleryConfig.js` | Adds only the 8px touch swipe threshold; Phase 1 motion constants retained |
@@ -104,7 +104,7 @@ Rapier upgrades. Warnings are not suppressed; node_modules is not modified.
   when it returned. Production bundle checks passed at all three widths, including
   production dummy-flag gating and a reduced-motion focus/details/close cycle.
 - Virtual QA-only event under React Strict Mode: registration URL, speakers,
-  actual ICS download, UTC timestamps and object-URL revocation. No real event
+  date formatting. No real event
   was added and no external registration page was opened or submitted.
 
 Browser scripts, results and screenshots are outside the repository in the local
@@ -112,8 +112,8 @@ Browser scripts, results and screenshots are outside the repository in the local
 
 ## Limits
 
-The supplied events remain placeholders; their booking/calendar actions are
-disabled. Calendar export requires explicit valid start/end times; Register
+The supplied events remain placeholders; their registration actions are
+disabled. Register
 requires a valid HTTP(S) URL. With WebGL unavailable, static images remain and
 interaction controls are disabled.
 

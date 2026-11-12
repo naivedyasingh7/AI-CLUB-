@@ -1,7 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-  calendarText,
   eventStatus,
   eventTimes,
   galleryLayout,
@@ -36,17 +35,6 @@ test("ambiguous, missing, reversed dates and previews are never announced as liv
     eventStatus({ ...event, development: true }),
     "DEVELOPMENT PREVIEW",
   );
-});
-test("calendar escapes content, folds long UTF-8 lines, and exports UTC instants", () => {
-  const text = calendarText({
-    ...event,
-    title: "€".repeat(50) + ", important",
-  });
-  assert.match(text, /DTSTART:20270101T043000Z\r\n/);
-  assert.match(text, /DESCRIPTION:line one\\nline two\\; escaped/);
-  for (const line of text.split("\r\n"))
-    assert.ok(Buffer.byteLength(line) <= 75);
-  assert.equal(calendarText({ ...event, development: true }), null);
 });
 test("rapid or invalid interaction actions cannot skip stages", () => {
   let state = { mode: "BROWSING", selectedId: null };
@@ -84,11 +72,10 @@ test("layout handles zero, one, two and many passes; actions reject script URLs"
   );
 });
 
-test("impossible calendar dates are rejected and a known start supports a countdown without inventing an end", () => {
+test("impossible dates are rejected and a known start supports a countdown without inventing an end", () => {
   assert.equal(eventTimes({ ...event, start: "2027-02-30T10:00:00Z" }), null);
   const partial = { ...event, end: null };
   const dates = eventTimes(partial);
   assert.equal(eventStatus(partial, dates.start - 1), "UPCOMING");
   assert.equal(eventStatus(partial, dates.start), "END TIME TO BE CONFIRMED");
-  assert.equal(calendarText(partial), null);
 });
