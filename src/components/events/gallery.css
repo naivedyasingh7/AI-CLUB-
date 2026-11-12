@@ -100,25 +100,6 @@
   letter-spacing: 0.12em;
   opacity: 0.5;
 }
-.gallery-explore {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 3px;
-  font:
-    7px FeatureMono,
-    monospace;
-  opacity: 0.75;
-}
-.gallery-explore > span {
-  font-size: 16px;
-  color: var(--pass-accent);
-  filter: drop-shadow(0 0 3px var(--pass-accent));
-}
-.gallery-pass:hover .gallery-explore,
-.gallery-pass:focus-visible .gallery-explore {
-  opacity: 1;
-}
 .gallery-controls {
   position: absolute;
   left: 32px;

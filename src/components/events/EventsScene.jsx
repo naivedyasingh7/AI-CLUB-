@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Environment, Lightformer, useTexture } from "@react-three/drei";
 import {
@@ -10,6 +10,7 @@ import {
   RepeatWrapping,
   SRGBColorSpace,
   Vector3,
+  Quaternion,
 } from "three";
 import { BadgeArtwork } from "./EventBadge";
 import { EVENT_CONFIG as C } from "./eventModel";
@@ -29,11 +30,30 @@ import {
   clamp,
   advanceSway,
 } from "./galleryConfig";
-function GalleryPass({ event, index, palette, motion, reduced, onProject }) {
+import {
+  OTHERS_OPACITY,
+  OTHERS_BACK,
+  MOBILE_PANEL_ZOOM,
+  panelCarrier,
+} from "./focusConfig";
+import { preloadFocusPhysics } from "./focusPhysicsLoader";
+const FocusLanyard = lazy(() => preloadFocusPhysics());
+function GalleryPass({
+  event,
+  index,
+  palette,
+  motion,
+  reduced,
+  onProject,
+  focus,
+  visual,
+  onPose,
+}) {
   const root = useRef(),
     pivot = useRef(),
     body = useRef(),
-    band = useRef();
+    band = useRef(),
+    lastOpacity = useRef(1);
   const spring = useRef({ angle: 0, velocity: 0 }),
     artworkMotion = useRef({ normalizedX: 0 });
   const { camera, size } = useThree();
@@ -59,6 +79,17 @@ function GalleryPass({ event, index, palette, motion, reduced, onProject }) {
       center: new Vector3(),
       right: new Vector3(),
       upper: new Vector3(),
+      worldPoints: Array.from({ length: 4 }, () => new Vector3()),
+      targetPosition: new Vector3(),
+      targetQuaternion: new Quaternion(),
+      fromPosition: new Vector3(),
+      fromQuaternion: new Quaternion(),
+      pose: {
+        anchor: new Vector3(),
+        joints: Array.from({ length: 3 }, () => new Vector3()),
+        position: new Vector3(),
+        quaternion: new Quaternion(),
+      },
     }),
     [],
   );
@@ -83,10 +114,11 @@ function GalleryPass({ event, index, palette, motion, reduced, onProject }) {
   useFrame((_, delta) => {
     const state = motion.current;
     const width =
-      2 *
-      Math.tan((camera.fov * Math.PI) / 360) *
-      camera.position.z *
-      camera.aspect;
+      (2 *
+        Math.tan((camera.fov * Math.PI) / 360) *
+        camera.position.z *
+        camera.aspect) /
+      camera.zoom;
     const units = width / size.width;
     const railX =
       (state.origin +
@@ -98,7 +130,33 @@ function GalleryPass({ event, index, palette, motion, reduced, onProject }) {
       ? DEPTH_FACTORS[index % DEPTH_FACTORS.length]
       : 1;
     const depthShift = railX * (factor - 1);
-    root.current.position.set(railX, C.railY, 0);
+    const selected = focus.index === index;
+    root.current.position.set(
+      railX,
+      C.railY,
+      selected ? 0 : -visual.current.focus * OTHERS_BACK,
+    );
+    root.current.visible = !(selected && focus.physicsVisible);
+    const opacity = selected
+      ? 1
+      : 1 - (1 - OTHERS_OPACITY) * visual.current.focus;
+    if (Math.abs(lastOpacity.current - opacity) > 0.0001) {
+      root.current.traverse((node) => {
+        if (!node.isMesh) return;
+        const materials = Array.isArray(node.material)
+          ? node.material
+          : [node.material];
+        materials.forEach((material) => {
+          const transparent = opacity < 0.999;
+          if (material.transparent !== transparent) {
+            material.transparent = transparent;
+            material.needsUpdate = true;
+          }
+          material.opacity = opacity;
+        });
+      });
+      lastOpacity.current = opacity;
+    }
     if (reduced) {
       spring.current.angle = 0;
       spring.current.velocity = 0;
@@ -118,12 +176,59 @@ function GalleryPass({ event, index, palette, motion, reduced, onProject }) {
       ? 0
       : spring.current.angle +
         Math.sin(state.time * IDLE_FREQUENCY + index * 0.7) * IDLE_SWAY;
+    if (selected) pivot.current.rotation.z *= 1 - visual.current.focus;
     body.current.position.set(depthShift, C.badgeY - C.railY, 0);
+    body.current.quaternion.identity();
     const endY = C.badgeY - C.railY + C.connectorY;
     math.curve.points[0].set(0, 0, 0.1);
     math.curve.points[1].set(depthShift * 0.15, -0.75, 0.1);
     math.curve.points[2].set(depthShift * 0.7, -1.5, 0.1);
     math.curve.points[3].set(depthShift, endY, 0.1);
+    pivot.current.updateWorldMatrix(true, false);
+    if (selected && focus.returnPose) {
+      body.current.updateWorldMatrix(true, false);
+      body.current.getWorldPosition(math.targetPosition);
+      body.current.getWorldQuaternion(math.targetQuaternion);
+      math.curve.points.forEach((point, i) =>
+        math.worldPoints[i].copy(point).applyMatrix4(pivot.current.matrixWorld),
+      );
+      root.current.position.set(0, 0, 0);
+      pivot.current.rotation.set(0, 0, 0);
+      math.fromPosition.set(...focus.returnPose.position);
+      math.fromQuaternion.set(...focus.returnPose.quaternion);
+      body.current.position.lerpVectors(
+        math.fromPosition,
+        math.targetPosition,
+        visual.current.blend,
+      );
+      body.current.quaternion.slerpQuaternions(
+        math.fromQuaternion,
+        math.targetQuaternion,
+        visual.current.blend,
+      );
+      math.curve.points[0]
+        .set(...focus.returnPose.anchor)
+        .lerp(math.worldPoints[0], visual.current.blend);
+      focus.returnPose.joints.forEach((point, i) =>
+        math.curve.points[i + 1]
+          .set(...point)
+          .lerp(math.worldPoints[i + 1], visual.current.blend),
+      );
+      pivot.current.updateWorldMatrix(true, false);
+    }
+    const pose = math.pose;
+    pose.anchor
+      .copy(math.curve.points[0])
+      .applyMatrix4(pivot.current.matrixWorld);
+    pose.joints.forEach((point, i) =>
+      point
+        .copy(math.curve.points[i + 1])
+        .applyMatrix4(pivot.current.matrixWorld),
+    );
+    body.current.updateWorldMatrix(true, false);
+    body.current.getWorldPosition(pose.position);
+    body.current.getWorldQuaternion(pose.quaternion);
+    onPose(index, pose);
     const attribute = band.current.geometry.attributes.position;
     for (let j = 0; j <= 32; j++) {
       const point = math.curve.getPoint(j / 32, math.samples[j]);
@@ -186,9 +291,24 @@ export default function EventsScene({
   motion,
   reduced,
   onProject,
+  focus,
+  visual,
+  mobile,
+  visible,
+  grip,
+  onPhysicalProject,
+  onHandoff,
+  onRigReady,
+  onRigDispose,
+  onDrag,
 }) {
   const { camera, size, invalidate } = useThree();
-  const rail = useRef();
+  const rail = useRef(),
+    poses = useRef([]),
+    armed = useRef(false);
+  const recordPose = useCallback((index, pose) => {
+    poses.current[index] = pose;
+  }, []);
   useEffect(() => {
     const bottom = C.badgeY - C.badgeHeight / 2,
       aim = (C.railY + bottom) / 2 + CAMERA_VERTICAL_OFFSET;
@@ -203,12 +323,20 @@ export default function EventsScene({
     invalidate();
   }, [camera, size.width, size.height, invalidate]);
   useFrame(() => {
+    const zoom = mobile
+      ? 1 + (MOBILE_PANEL_ZOOM - 1) * visual.current.panel
+      : 1;
+    if (Math.abs(camera.zoom - zoom) > 0.00001) {
+      Object.assign(camera, { zoom });
+      camera.updateProjectionMatrix();
+    }
     const state = motion.current,
       width =
-        2 *
-        Math.tan((camera.fov * Math.PI) / 360) *
-        camera.position.z *
-        camera.aspect,
+        (2 *
+          Math.tan((camera.fov * Math.PI) / 360) *
+          camera.position.z *
+          camera.aspect) /
+        camera.zoom,
       units = width / size.width;
     rail.current.position.x =
       (state.origin +
@@ -216,9 +344,29 @@ export default function EventsScene({
         state.current -
         size.width / 2) *
       units;
+    // Keep the focused strap attached as the mobile carrier lifts above the sheet.
+    rail.current.position.y =
+      C.railY +
+      0.04 +
+      (mobile ? panelCarrier(camera, visual.current.panel, true).y : 0);
     rail.current.scale.x =
       (events.length - 1) * state.slot * units + width * 1.5;
-  }, -2);
+  }, -3);
+  useFrame(() => {
+    if (focus.mode !== "ARMING") {
+      armed.current = false;
+      return;
+    }
+    const pose = poses.current[focus.index];
+    if (!pose || armed.current) return;
+    armed.current = true;
+    onHandoff({
+      anchor: pose.anchor.toArray(),
+      joints: pose.joints.map((point) => point.toArray()),
+      position: pose.position.toArray(),
+      quaternion: pose.quaternion.toArray(),
+    });
+  }, 0);
   const metal = useMemo(
     () => new Color(palette.bg).lerp(new Color(palette.text), 0.19),
     [palette],
@@ -272,8 +420,29 @@ export default function EventsScene({
           motion={motion}
           reduced={reduced}
           onProject={onProject}
+          focus={focus}
+          visual={visual}
+          onPose={recordPose}
         />
       ))}
+      {focus.physicsMounted && focus.pose && (
+        <Suspense fallback={null}>
+          <FocusLanyard
+            event={events[focus.index]}
+            palette={palette}
+            pose={focus.pose}
+            visual={visual}
+            phase={focus.mode}
+            mobile={mobile}
+            grip={grip}
+            onProject={onPhysicalProject}
+            onReady={onRigReady}
+            onDispose={onRigDispose}
+            onDrag={onDrag}
+            paused={!visible}
+          />
+        </Suspense>
+      )}
     </>
   );
 }

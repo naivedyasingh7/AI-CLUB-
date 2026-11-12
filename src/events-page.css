@@ -76,3 +76,17 @@
     gap: 16px;
   }
 }
+
+/* Equal line boxes keep the active underline from lifting the Events label. */
+.events-page-header nav a {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0;
+  line-height: 20px;
+  border-bottom: 1px solid transparent;
+}
+.events-page-header nav a[aria-current] {
+  padding: 0;
+  border-bottom-color: currentColor;
+}

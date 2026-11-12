@@ -15,7 +15,15 @@ import {
 } from "../../data/events";
 import { useSmoothHorizontalScroll } from "../../hooks/useSmoothHorizontalScroll";
 import { DPR_CAP, CAMERA_FOV, LABEL_PARALLAX } from "./galleryConfig";
+import { useEventFocus } from "../../hooks/useEventFocus";
+import FocusDetailsPanel from "./FocusDetailsPanel";
+import {
+  EMPTY_CLICK_SLOP,
+  OTHERS_OPACITY,
+  MOBILE_BREAKPOINT,
+} from "./focusConfig";
 import "./gallery.css";
+import "./focus.css";
 const Scene = lazy(() => import("./EventsScene"));
 class SceneBoundary extends Component {
   state = { failed: false };
@@ -42,10 +50,16 @@ export default function EventsSection({
     labels = useRef([]),
     progress = useRef(null),
     invalidate = useRef(null),
-    fallbackTrack = useRef(null);
+    fallbackTrack = useRef(null),
+    mainCanvas = useRef(null),
+    emptyDown = useRef(null);
   const cameraConfig = useMemo(
     () => ({ position: [0, 0.975, 13], fov: CAMERA_FOV }),
     [],
+  );
+  const [scrollLocked, setScrollLocked] = useState(false);
+  const [mobile, setMobile] = useState(
+    () => matchMedia(`(max-width:${MOBILE_BREAKPOINT - 1}px)`).matches,
   );
   const [visible, setVisible] = useState(false),
     [failed, setFailed] = useState(false);
@@ -73,11 +87,15 @@ export default function EventsSection({
       { threshold: 0.01 },
     );
     observer.observe(viewport.current);
+    const mobileMedia = matchMedia(`(max-width:${MOBILE_BREAKPOINT - 1}px)`),
+      changeMobile = () => setMobile(mobileMedia.matches);
+    mobileMedia.addEventListener("change", changeMobile);
     media.addEventListener("change", change);
     document.addEventListener("ai-club:reveal", reveal);
     return () => {
       observer.disconnect();
       media.removeEventListener("change", change);
+      mobileMedia.removeEventListener("change", changeMobile);
       document.removeEventListener("ai-club:reveal", reveal);
     };
   }, []);
@@ -112,22 +130,70 @@ export default function EventsSection({
     active: visible && revealed,
     reduced,
     onFrame: frame,
+    locked: scrollLocked,
   });
+  const {
+    focus,
+    visual,
+    state: focusState,
+    grip: focusGrip,
+    details: detailsButton,
+    connector: connectorLine,
+    panel: detailsPanel,
+    select: selectEvent,
+    close: closeFocus,
+    open: openDetails,
+    onHandoff,
+    onRigReady,
+    onRigDispose,
+    onDrag,
+    dragging,
+    project: projectFocus,
+    restore: restoringFocus,
+    resetAfterError,
+  } = useEventFocus({
+    motion,
+    viewport,
+    passButtons,
+    frame,
+    reduced,
+    mobile,
+    onLock: setScrollLocked,
+  });
+  const selected = focus.index === null ? null : events[focus.index];
+  const focusActive = focus.mode !== "BROWSING";
   useEffect(() => {
     frame(motion.current);
   }, [failed, frame, motion]);
-  const project = useCallback((index, x, y, a, b, c, d) => {
+  const project = (index, x, y, a, b, c, d) => {
+    if (focusState.current.index === index && focusState.current.physicsVisible)
+      return;
     const button = passButtons.current[index];
     if (!button) return;
     button.style.left = `${x}px`;
     button.style.top = `${y}px`;
     button.style.transform = `translate(-50%,-50%) matrix(${a},${b},${c},${d},0,0)`;
     button.style.visibility = "visible";
-  }, []);
-  const fail = useCallback(() => setFailed(true), []);
+    button.style.opacity = String(
+      focusState.current.index === index
+        ? 1
+        : 1 - (1 - OTHERS_OPACITY) * visual.current.focus,
+    );
+    if (
+      focusState.current.index === index &&
+      focusState.current.mode === "FOCUSED" &&
+      !focusState.current.physicsMounted
+    )
+      projectFocus(x, y, a, b, c, d);
+  };
+  const fail = useCallback(() => {
+    resetAfterError();
+    setFailed(true);
+  }, [resetAfterError]);
   useEffect(() => {
     const element = viewport.current;
     const lost = (event) => {
+      if (event.target !== mainCanvas.current) return;
       event.preventDefault();
       fail();
     };
@@ -153,6 +219,8 @@ export default function EventsSection({
       className="lanyard-gallery"
       aria-labelledby="events-heading"
       data-renderer={failed ? "fallback" : "webgl"}
+      data-focus-state={focus.mode}
+      data-physics={focus.physicsMounted ? "active" : "none"}
     >
       <div
         ref={viewport}
@@ -161,12 +229,31 @@ export default function EventsSection({
         tabIndex={0}
         role="region"
         aria-label="Event lanyards; use arrow keys, scroll or swipe to browse"
+        onPointerDownCapture={(event) => {
+          emptyDown.current = { x: event.clientX, y: event.clientY };
+        }}
+        onClick={(event) => {
+          if (
+            !focusActive ||
+            event.target.closest("button,a,[data-focus-panel]")
+          )
+            return;
+          const start = emptyDown.current;
+          if (
+            start &&
+            Math.hypot(event.clientX - start.x, event.clientY - start.y) <=
+              EMPTY_CLICK_SLOP
+          )
+            closeFocus();
+        }}
       >
         <header className="gallery-heading">
           <h1 id="events-heading">AI CLUB / EVENTS</h1>
           <span>
-            {String(navigation.index + 1).padStart(2, "0")} /{" "}
-            {String(events.length).padStart(2, "0")}
+            {String(
+              focusActive ? focus.index + 1 : navigation.index + 1,
+            ).padStart(2, "0")}{" "}
+            / {String(events.length).padStart(2, "0")}
           </span>
         </header>
         <div className="gallery-labels" aria-hidden="true">
@@ -195,7 +282,13 @@ export default function EventsSection({
               >
                 <Canvas
                   dpr={[1, DPR_CAP]}
-                  frameloop={visible && revealed ? "demand" : "never"}
+                  frameloop={
+                    visible && revealed
+                      ? focus.physicsMounted
+                        ? "always"
+                        : "demand"
+                      : "never"
+                  }
                   camera={cameraConfig}
                   gl={{
                     antialias: true,
@@ -204,6 +297,7 @@ export default function EventsSection({
                   }}
                   onCreated={(state) => {
                     state.gl.domElement.setAttribute("aria-hidden", "true");
+                    mainCanvas.current = state.gl.domElement;
                     invalidate.current = state.invalidate;
                     state.invalidate();
                   }}
@@ -214,6 +308,16 @@ export default function EventsSection({
                     motion={motion}
                     reduced={reduced}
                     onProject={project}
+                    focus={focus}
+                    visual={visual}
+                    mobile={mobile}
+                    visible={visible && revealed}
+                    grip={focusGrip}
+                    onPhysicalProject={projectFocus}
+                    onHandoff={onHandoff}
+                    onRigReady={onRigReady}
+                    onRigDispose={onRigDispose}
+                    onDrag={onDrag}
                   />
                 </Canvas>
               </Suspense>
@@ -230,30 +334,87 @@ export default function EventsSection({
             ref={(element) => {
               passButtons.current[index] = element;
             }}
-            className={`gallery-pass ${failed ? "gallery-pass-fallback" : ""}`}
+            className={`gallery-pass ${failed ? "gallery-pass-fallback" : ""} ${focusActive && focus.index !== index ? "is-unfocused" : ""} ${focus.index === index && focus.physicsVisible ? "is-physical" : ""}`}
             style={{
               visibility: failed ? "visible" : "hidden",
               "--pass-accent": event.accent,
             }}
             aria-label={`Open event: ${event.title}`}
+            disabled={focusActive || failed}
             onFocus={(event) => {
-              if (event.currentTarget.matches(":focus-visible"))
+              if (
+                !restoringFocus.current &&
+                event.currentTarget.matches(":focus-visible")
+              )
                 goTo(index * motion.current.slot);
             }}
-            onClick={() => {}}
+            onClick={() => selectEvent(index)}
           >
             <span className="gallery-pass-caption">
               <strong>{event.title}</strong>
               <small>
                 {event.isPlaceholder ? "DEVELOPMENT PREVIEW" : event.group}
               </small>
-              <span className="gallery-explore">
-                <span aria-hidden="true">⌗</span> Explore event ↗
-              </span>
             </span>
           </button>
         ))}
-        <footer className="gallery-controls">
+        {focusActive && (
+          <button
+            className="gallery-focus-close"
+            aria-label="Close focused event"
+            onClick={closeFocus}
+          >
+            Close <span aria-hidden="true">×</span>
+          </button>
+        )}
+        {focus.physicsMounted && (
+          <button
+            ref={focusGrip}
+            className={`focus-grip ${dragging ? "is-dragging" : ""}`}
+            style={{ visibility: "hidden" }}
+            aria-label={`Drag ${selected.title} pass; arrow keys swing the badge`}
+          />
+        )}
+        {focus.mode === "FOCUSED" && (
+          <>
+            <p className="focus-hint" role="status">
+              {focus.physicsVisible ? "Drag to interact" : "Event preview"}
+            </p>
+            <svg className="focus-connector" aria-hidden="true">
+              <line ref={connectorLine} />
+            </svg>
+            <button
+              ref={detailsButton}
+              className="focus-details-button"
+              style={{
+                "--focus-accent": selected.accent,
+                visibility: "hidden",
+              }}
+              aria-label="Event details"
+              disabled={dragging}
+              onClick={openDetails}
+            >
+              <span aria-hidden="true">⌗</span>
+              <small>Event details</small>
+            </button>
+          </>
+        )}
+        {["WAITING", "ARMING", "ACTIVATING"].includes(focus.mode) && (
+          <p className="focus-hint" role="status">
+            Preparing interaction…
+          </p>
+        )}
+        {focus.panelMounted && selected && (
+          <FocusDetailsPanel
+            ref={detailsPanel}
+            event={selected}
+            palette={palette}
+            reduced={reduced}
+            mobile={mobile}
+            onClose={closeFocus}
+          />
+        )}
+        <footer className="gallery-controls" hidden={focusActive}>
           <span>
             {navigation.overflow
               ? "SCROLL / SWIPE / DRAG TO BROWSE"

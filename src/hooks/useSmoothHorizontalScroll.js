@@ -6,6 +6,7 @@ import {
   VELOCITY_EASE,
   WHEEL_LINE_PIXELS,
   SCROLL_SNAP_EPSILON,
+  TOUCH_DRAG_SLOP,
   clamp,
   frameEase,
   galleryMetrics,
@@ -16,6 +17,7 @@ export function useSmoothHorizontalScroll({
   count,
   active,
   reduced,
+  locked = false,
   onFrame,
 }) {
   const motion = useRef({
@@ -75,7 +77,7 @@ export function useSmoothHorizontalScroll({
       callback.current?.(state);
     };
     const moveTo = (value) => {
-      if (!active || document.hidden) return;
+      if (!active || locked || document.hidden) return;
       state.target = clamp(value, 0, state.max);
       if (reduced) {
         state.current = state.target;
@@ -93,9 +95,11 @@ export function useSmoothHorizontalScroll({
         ? state.target
         : clamp(currentIndex * state.slot, 0, state.max);
       state.velocity = 0;
-      viewport.style.touchAction = state.overflow
-        ? "pan-y"
-        : originalTouchAction;
+      viewport.style.touchAction = locked
+        ? "none"
+        : state.overflow
+          ? "pan-y"
+          : originalTouchAction;
       publish();
     };
     const tick = (timestamp) => {
@@ -105,13 +109,16 @@ export function useSmoothHorizontalScroll({
         : 1 / 60;
       last = timestamp;
       const previous = state.current;
-      state.current +=
-        (state.target - state.current) * frameEase(SCROLL_EASE, dt);
+      if (!locked)
+        state.current +=
+          (state.target - state.current) * frameEase(SCROLL_EASE, dt);
       if (Math.abs(state.current - state.target) < SCROLL_SNAP_EPSILON)
         state.current = state.target;
       const velocity = dt > 0 ? (state.current - previous) / dt : 0;
-      state.velocity +=
-        (velocity - state.velocity) * frameEase(VELOCITY_EASE, dt);
+      state.velocity = locked
+        ? 0
+        : state.velocity +
+          (velocity - state.velocity) * frameEase(VELOCITY_EASE, dt);
       state.time += dt;
       callback.current?.(state);
       frame = requestAnimationFrame(tick);
@@ -125,7 +132,14 @@ export function useSmoothHorizontalScroll({
         frame = requestAnimationFrame(tick);
     };
     const wheel = (event) => {
-      if (!active || !state.overflow || event.ctrlKey || event.metaKey) return;
+      if (
+        !active ||
+        locked ||
+        !state.overflow ||
+        event.ctrlKey ||
+        event.metaKey
+      )
+        return;
       event.preventDefault();
       const scale =
         event.deltaMode === 1
@@ -144,6 +158,7 @@ export function useSmoothHorizontalScroll({
     const key = (event) => {
       if (
         !active ||
+        locked ||
         !state.overflow ||
         event.altKey ||
         event.ctrlKey ||
@@ -171,18 +186,34 @@ export function useSmoothHorizontalScroll({
         control?.classList.contains("gallery-pass");
       if (
         !active ||
+        locked ||
         !state.overflow ||
         event.button !== 0 ||
         (control && !swipingPass)
       )
         return;
-      pointer = { id: event.pointerId, x: event.clientX, target: state.target };
-      viewport.setPointerCapture(event.pointerId);
-      viewport.dataset.dragging = "true";
+      pointer = {
+        id: event.pointerId,
+        x: event.clientX,
+        target: state.target,
+        fromPass: swipingPass,
+        moved: false,
+      };
+      if (!swipingPass) {
+        viewport.setPointerCapture(event.pointerId);
+        viewport.dataset.dragging = "true";
+      }
     };
     const drag = (event) => {
-      if (pointer?.id === event.pointerId)
+      if (pointer?.id === event.pointerId) {
+        if (pointer.fromPass && !pointer.moved) {
+          if (Math.abs(event.clientX - pointer.x) < TOUCH_DRAG_SLOP) return;
+          pointer.moved = true;
+          viewport.setPointerCapture(event.pointerId);
+          viewport.dataset.dragging = "true";
+        }
         moveTo(pointer.target + pointer.x - event.clientX);
+      }
     };
     const release = () => {
       if (pointer && viewport.hasPointerCapture(pointer.id))
@@ -190,13 +221,18 @@ export function useSmoothHorizontalScroll({
       pointer = null;
       delete viewport.dataset.dragging;
     };
+    const lostCapture = (event) => {
+      // A touch button's implicit capture is released when the viewport takes it.
+      // Its bubbling event must not cancel the newly captured gallery swipe.
+      if (event.target === viewport) release();
+    };
     viewport.addEventListener("wheel", wheel, { passive: false });
     viewport.addEventListener("keydown", key);
     viewport.addEventListener("pointerdown", down);
     viewport.addEventListener("pointermove", drag);
     viewport.addEventListener("pointerup", release);
     viewport.addEventListener("pointercancel", release);
-    viewport.addEventListener("lostpointercapture", release);
+    viewport.addEventListener("lostpointercapture", lostCapture);
     document.addEventListener("visibilitychange", visibility);
     const observer = new ResizeObserver(resize);
     observer.observe(viewport);
@@ -214,11 +250,11 @@ export function useSmoothHorizontalScroll({
       viewport.removeEventListener("pointermove", drag);
       viewport.removeEventListener("pointerup", release);
       viewport.removeEventListener("pointercancel", release);
-      viewport.removeEventListener("lostpointercapture", release);
+      viewport.removeEventListener("lostpointercapture", lostCapture);
       document.removeEventListener("visibilitychange", visibility);
       viewport.style.touchAction = originalTouchAction;
       state.velocity = 0;
     };
-  }, [viewportRef, count, active, reduced]);
+  }, [viewportRef, count, active, reduced, locked]);
   return { motion, navigation, goTo, step };
 }

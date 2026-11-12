@@ -26,6 +26,7 @@ export const MAX_FRAME_DELTA = 0.05;
 export const VELOCITY_EASE = 0.2;
 export const WHEEL_LINE_PIXELS = 16;
 export const SCROLL_SNAP_EPSILON = 0.02;
+export const TOUCH_DRAG_SLOP = 8;
 export const DEV_DUMMY_LIMIT = 20;
 
 export const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
