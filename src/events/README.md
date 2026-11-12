@@ -3,6 +3,13 @@
 Edit **only `src/events/events.js`**. Put pictures in **`src/events/posters/`**.
 No other website file needs changing. Start from the latest approved website code.
 
+For a fuller explanation with a field-by-field table and instructions for changing
+an existing event, read [the main README](../../README.md).
+
+To update an existing event, find its title, change the relevant text inside the
+quotes, and keep its `id`. To replace its picture, upload the new file and change
+only that event's `poster` filename. Keep the surrounding commas and braces.
+
 ### 1. Add the details
 
 Copy the commented TEMPLATE object at the top of `events.js` into the `events`
