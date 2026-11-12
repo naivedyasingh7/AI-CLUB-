@@ -1,0 +1,213 @@
+.lanyard-gallery {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: Arial, sans-serif;
+}
+.lanyard-gallery * {
+  box-sizing: border-box;
+}
+.gallery-viewport {
+  position: relative;
+  width: 100%;
+  height: calc(100svh - 72px);
+  min-height: 580px;
+  overflow: clip;
+  isolation: isolate;
+  cursor: grab;
+}
+.gallery-viewport[data-dragging] {
+  cursor: grabbing;
+}
+.gallery-viewport > div:has(> canvas) {
+  position: absolute !important;
+  inset: 0;
+}
+.gallery-heading {
+  position: absolute;
+  z-index: 5;
+  left: 32px;
+  right: 32px;
+  top: 12px;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.gallery-heading h1,
+.gallery-heading > span {
+  margin: 0;
+  font: 11px monospace;
+  letter-spacing: 0.15em;
+  font-weight: 400;
+  opacity: 0.65;
+}
+.gallery-labels {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.gallery-labels span {
+  position: absolute;
+  top: 32%;
+  transform: translateX(-50%);
+  font: clamp(100px, 18vw, 280px) monospace;
+  letter-spacing: -0.09em;
+  color: var(--color-text);
+  opacity: 0.045;
+}
+.gallery-pass {
+  position: absolute;
+  z-index: 3;
+  width: 180px;
+  height: 260px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  color: var(--color-text);
+  background: transparent;
+  transform-origin: center;
+  cursor: pointer;
+}
+.gallery-pass:focus-visible {
+  outline: 2px solid var(--pass-accent, var(--color-text));
+  outline-offset: 5px;
+}
+.gallery-pass-caption {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+}
+.gallery-pass-caption strong {
+  font-size: 13px;
+  line-height: 1.2;
+  font-weight: 400;
+}
+.gallery-pass-caption small {
+  font: 6px monospace;
+  letter-spacing: 0.12em;
+  opacity: 0.5;
+}
+.gallery-controls {
+  position: absolute;
+  left: 32px;
+  right: 32px;
+  bottom: 20px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.gallery-controls > span {
+  font: 9px monospace;
+  letter-spacing: 0.12em;
+  opacity: 0.45;
+}
+.gallery-controls nav {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.gallery-controls button {
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid color-mix(in srgb, var(--color-text) 15%, transparent);
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  font-size: 20px;
+}
+.gallery-controls button:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+.gallery-controls button:focus-visible,
+.gallery-viewport:focus-visible {
+  outline: 1px solid var(--color-text);
+  outline-offset: -2px;
+}
+.gallery-progress {
+  width: 180px;
+  height: 1px;
+  background: color-mix(in srgb, var(--color-text) 15%, transparent);
+}
+.gallery-progress span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--color-text);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.gallery-loading {
+  position: absolute;
+  top: 45%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font: 12px monospace;
+}
+.gallery-fallback {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+.gallery-fallback > div {
+  flex: none;
+  width: 60vw;
+  display: flex;
+  justify-content: center;
+}
+.gallery-fallback img {
+  width: 180px;
+  max-width: 50vw;
+  height: 260px;
+  object-fit: contain;
+}
+@media (max-width: 600px) {
+  .gallery-viewport {
+    height: calc(100svh - 120px);
+    min-height: 540px;
+  }
+  .gallery-heading {
+    top: 18px;
+    left: 20px;
+    right: 20px;
+  }
+  .gallery-heading h1,
+  .gallery-heading > span {
+    font-size: 9px;
+  }
+  .gallery-controls {
+    left: 20px;
+    right: 20px;
+    bottom: 12px;
+    justify-content: center;
+  }
+  .gallery-controls > span {
+    display: none;
+  }
+  .gallery-progress {
+    width: 150px;
+  }
+  .gallery-pass-caption {
+    width: 250px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gallery-pass * {
+    animation: none;
+    transition: none;
+  }
+}

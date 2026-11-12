@@ -1,5 +1,5 @@
 import React from 'react';
-import { Award, ShieldCheck, Trophy, Star } from 'lucide-react';
+import { ShieldCheck, Trophy } from 'lucide-react';
 
 export default function AwardsSection() {
   const awards = [

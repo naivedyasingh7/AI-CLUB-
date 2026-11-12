@@ -18,7 +18,7 @@ export default function CyberCanvas({ type = 'tornado', className = '' }) {
 
     // Particle setup based on type
     const count = type === 'tornado' ? 140 : type === 'defeat' ? 90 : 70;
-    const particles = Array.from({ length: count }, (_, i) => ({
+    const particles = Array.from({ length: count }, () => ({
       x: (Math.random() - 0.5) * canvas.width,
       y: (Math.random() - 0.5) * canvas.height,
       z: Math.random() * canvas.width,

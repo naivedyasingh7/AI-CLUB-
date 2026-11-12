@@ -44,7 +44,7 @@ export default function Services() {
       <h1 className="services-title font-normal tracking-tight">Services</h1>
 
       <div className="services-grid">
-        {serviceItems.map((item, idx) => (
+        {serviceItems.map((item) => (
           <div key={item.title} className="services-item">
             <div className="services-item__poster relative rounded-xl border border-white/10 overflow-hidden">
               <CyberCanvas type={item.type} />

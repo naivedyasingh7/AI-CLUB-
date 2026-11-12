@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 
 export default function Menu({ isOpen, onClose }) {
-  const [activeSpeed, setActiveSpeed] = useState(1.0);
 
   const menuItems = [
-    { label: 'Home', href: '/', speed: 1.0, index: '[ 00 - 01 ]' },
-    { label: 'Services', href: '/services', speed: 1.5, index: '[ 00 - 02 ]' },
-    { label: 'About', href: '/about', speed: 0.8, index: '[ 00 - 03 ]' },
-    { label: 'Contact', href: '/contacts', speed: 2.0, index: '[ 00 - 04 ]' }
+    { label: 'Home', href: '/', index: '[ 00 - 01 ]' },
+    { label: 'Services', href: '/services', index: '[ 00 - 02 ]' },
+    { label: 'About', href: '/about', index: '[ 00 - 03 ]' },
+    { label: 'Contact', href: '/contacts', index: '[ 00 - 04 ]' }
   ];
 
   return (
@@ -30,7 +29,6 @@ export default function Menu({ isOpen, onClose }) {
               {menuItems.map((item) => (
                 <li 
                   key={item.label} 
-                  onMouseEnter={() => setActiveSpeed(item.speed)}
                 >
                   <a href={item.href} data-index={item.index}>
                     {item.label}
