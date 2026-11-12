@@ -1,14 +1,21 @@
+import { DEV_DUMMY_LIMIT } from "../components/events/galleryConfig.js";
+
 /**
  * @typedef {Object} ClubEvent
  * @property {string} id Stable unique identifier.
  * @property {string} title
+ * @property {string|null} startsAt
+ * @property {string|null} venue
+ * @property {string} group
+ * @property {string} posterSrc
+ * @property {string} accent Existing club logo colour.
+ * @property {boolean} isPlaceholder
  * @property {string} description
  * @property {string=} tagline
  * @property {boolean=} development Explicitly labels an unannounced development preview.
  * @property {string|null=} start ISO 8601 with Z or an explicit offset, never a local date string.
  * @property {string|null=} end ISO 8601 with Z or an explicit offset.
  * @property {string=} timeZone IANA zone, e.g. Asia/Kolkata.
- * @property {string=} venue
  * @property {'in-person'|'online'|'hybrid'=} mode
  * @property {string=} poster Local /public path.
  * @property {string=} badgeFront Optional local artwork, defaults to poster.
@@ -30,6 +37,12 @@ export const events = [
   {
     id: "development-preview",
     title: "The next chapter.",
+    startsAt: null,
+    venue: null,
+    group: "AI Club · VIT Bhopal",
+    posterSrc: "/img/events/archive-preview.svg",
+    accent: "#ff8c00",
+    isPlaceholder: true,
     tagline: "A place for what comes next.",
     description:
       "This is a development preview of the AI Club event archive. The club has not supplied an event announcement yet. The title, artwork and pass are placeholders; date, venue and registration will appear here when confirmed.",
@@ -43,4 +56,46 @@ export const events = [
     community: "AI Club · VIT Bhopal",
     registrationState: "unannounced",
   },
+  {
+    id: "workshop-slot-tba",
+    title: "Workshop Slot (TBA)",
+    tagline: "A placeholder, not an announced workshop.",
+    startsAt: null,
+    venue: null,
+    group: "AI Club · VIT Bhopal",
+    posterSrc: "/img/events/workshop-slot-tba.svg",
+    poster: "/img/events/workshop-slot-tba.svg",
+    badgeFront: "/img/events/workshop-slot-tba.svg",
+    badgeBack: "/img/events/workshop-slot-tba.svg",
+    accent: "#00bcd4",
+    isPlaceholder: true,
+    development: true,
+    description:
+      "Dummy workshop slot for gallery development. No workshop, date, venue or registration has been announced.",
+    start: null,
+    end: null,
+    timeZone: "Asia/Kolkata",
+    community: "AI Club · VIT Bhopal",
+    registrationState: "unannounced",
+  },
 ];
+
+// The caller passes import.meta.env.DEV: production ignores the query entirely.
+export function eventsForGallery(base, search, development = false) {
+  if (!development) return base;
+  const value = new URLSearchParams(search).get("dummies");
+  if (!value || !/^\d+$/.test(value)) return base;
+  const count = Math.min(DEV_DUMMY_LIMIT, Number(value));
+  if (count < 1) return base;
+  const dummy = base.find((event) => event.id === "workshop-slot-tba");
+  if (!dummy) return base;
+  return [
+    ...base.filter((event) => event.id !== dummy.id),
+    ...Array.from({ length: count }, (_, index) => ({
+      ...dummy,
+      id: `dev-workshop-${index + 1}`,
+      title: `Workshop Slot (TBA) · ${index + 1}`,
+      accent: index % 2 === 0 ? "#00bcd4" : "#ff8c00",
+    })),
+  ];
+}

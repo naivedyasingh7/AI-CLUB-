@@ -1,45 +1,181 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import { Suspense, lazy } from "react";
-import { Environment, Lightformer } from "@react-three/drei";
-import { BadgeArtwork } from "./EventBadge";
-const ActiveLanyard = lazy(() => import("./InteractiveLanyard"));
+import { Environment, Lightformer, useTexture } from "@react-three/drei";
 import {
+  BufferGeometry,
+  BufferAttribute,
+  DoubleSide,
   Color,
-  DataTexture,
-  MathUtils,
-  RGBAFormat,
+  CatmullRomCurve3,
   RepeatWrapping,
+  SRGBColorSpace,
   Vector3,
 } from "three";
-import gsap from "gsap";
-import { EVENT_CONFIG as C, galleryLayout } from "./eventModel";
-
-function StaticPass({ event, index, layout, palette, onSelect }) {
-  const angle = index * layout.step;
+import { BadgeArtwork } from "./EventBadge";
+import { EVENT_CONFIG as C } from "./eventModel";
+import {
+  CAMERA_FILL,
+  CAMERA_VERTICAL_OFFSET,
+  CAMERA_SAFE_WIDTH,
+  VELOCITY_REFERENCE_WIDTH,
+  STRAP_ACCENT_MIX,
+  DEPTH_FACTORS,
+  RAIL_PARALLAX,
+  SWAY_STRENGTH,
+  SWAY_MAX_ANGLE,
+  IDLE_SWAY,
+  IDLE_FREQUENCY,
+  MAX_FRAME_DELTA,
+  clamp,
+  advanceSway,
+} from "./galleryConfig";
+function GalleryPass({ event, index, palette, motion, reduced, onProject }) {
+  const root = useRef(),
+    pivot = useRef(),
+    body = useRef(),
+    band = useRef();
+  const spring = useRef({ angle: 0, velocity: 0 }),
+    artworkMotion = useRef({ normalizedX: 0 });
+  const { camera, size } = useThree();
+  const fabric = useTexture("/models/events/fabric.svg");
+  useEffect(() => {
+    Object.assign(fabric, {
+      wrapS: RepeatWrapping,
+      wrapT: RepeatWrapping,
+      colorSpace: SRGBColorSpace,
+      anisotropy: 8,
+      needsUpdate: true,
+    });
+  }, [fabric]);
+  const math = useMemo(
+    () => ({
+      curve: new CatmullRomCurve3(
+        Array.from({ length: 4 }, () => new Vector3()),
+        false,
+        "chordal",
+      ),
+      samples: Array.from({ length: 33 }, () => new Vector3()),
+      tangent: new Vector3(),
+      center: new Vector3(),
+      right: new Vector3(),
+      upper: new Vector3(),
+    }),
+    [],
+  );
+  const ribbon = useMemo(() => {
+    const geometry = new BufferGeometry(),
+      positions = new Float32Array(33 * 6),
+      uv = new Float32Array(33 * 4),
+      indices = [];
+    for (let i = 0; i <= 32; i++) {
+      uv.set([i / 16, 0, i / 16, 1], i * 4);
+      if (i < 32) {
+        const k = i * 2;
+        indices.push(k, k + 1, k + 2, k + 1, k + 3, k + 2);
+      }
+    }
+    geometry.setAttribute("position", new BufferAttribute(positions, 3));
+    geometry.setAttribute("uv", new BufferAttribute(uv, 2));
+    geometry.setIndex(indices);
+    return geometry;
+  }, []);
+  useEffect(() => () => ribbon.dispose(), [ribbon]);
+  useFrame((_, delta) => {
+    const state = motion.current;
+    const width =
+      2 *
+      Math.tan((camera.fov * Math.PI) / 360) *
+      camera.position.z *
+      camera.aspect;
+    const units = width / size.width;
+    const railX =
+      (state.origin +
+        index * state.slot -
+        state.current * RAIL_PARALLAX -
+        size.width / 2) *
+      units;
+    const factor = state.overflow
+      ? DEPTH_FACTORS[index % DEPTH_FACTORS.length]
+      : 1;
+    const depthShift = railX * (factor - 1);
+    root.current.position.set(railX, C.railY, 0);
+    if (reduced) {
+      spring.current.angle = 0;
+      spring.current.velocity = 0;
+    } else
+      advanceSway(
+        spring.current,
+        clamp(
+          (-state.velocity / state.width) *
+            VELOCITY_REFERENCE_WIDTH *
+            SWAY_STRENGTH,
+          -SWAY_MAX_ANGLE,
+          SWAY_MAX_ANGLE,
+        ),
+        Math.min(delta, MAX_FRAME_DELTA),
+      );
+    pivot.current.rotation.z = reduced
+      ? 0
+      : spring.current.angle +
+        Math.sin(state.time * IDLE_FREQUENCY + index * 0.7) * IDLE_SWAY;
+    body.current.position.set(depthShift, C.badgeY - C.railY, 0);
+    const endY = C.badgeY - C.railY + C.connectorY;
+    math.curve.points[0].set(0, 0, 0.1);
+    math.curve.points[1].set(depthShift * 0.15, -0.75, 0.1);
+    math.curve.points[2].set(depthShift * 0.7, -1.5, 0.1);
+    math.curve.points[3].set(depthShift, endY, 0.1);
+    const attribute = band.current.geometry.attributes.position;
+    for (let j = 0; j <= 32; j++) {
+      const point = math.curve.getPoint(j / 32, math.samples[j]);
+      math.curve.getTangent(j / 32, math.tangent);
+      const sideX = (-math.tangent.y * C.strapWorldWidth) / 2,
+        sideY = (math.tangent.x * C.strapWorldWidth) / 2;
+      attribute.setXYZ(j * 2, point.x - sideX, point.y - sideY, point.z);
+      attribute.setXYZ(j * 2 + 1, point.x + sideX, point.y + sideY, point.z);
+    }
+    attribute.needsUpdate = true;
+    body.current.updateWorldMatrix(true, false);
+    body.current.localToWorld(math.center.set(0, -0.11, 0.11));
+    body.current.localToWorld(math.right.set(0.9, -0.11, 0.11));
+    body.current.localToWorld(math.upper.set(0, 1.19, 0.11));
+    math.center.project(camera);
+    math.right.project(camera);
+    math.upper.project(camera);
+    const x = ((math.center.x + 1) * size.width) / 2,
+      y = ((1 - math.center.y) * size.height) / 2;
+    artworkMotion.current.normalizedX = (x - size.width / 2) / size.width;
+    onProject(
+      index,
+      x,
+      y,
+      (((math.right.x + 1) * size.width) / 2 - x) / 90,
+      (((1 - math.right.y) * size.height) / 2 - y) / 90,
+      (x - ((math.upper.x + 1) * size.width) / 2) / 130,
+      (y - ((1 - math.upper.y) * size.height) / 2) / 130,
+    );
+  }, -1);
+  const fabricColor = useMemo(
+    () =>
+      new Color(palette.text).lerp(new Color(event.accent), STRAP_ACCENT_MIX),
+    [palette.text, event.accent],
+  );
   return (
-    <group
-      position={[
-        Math.sin(angle) * layout.radius,
-        0,
-        Math.cos(angle) * layout.radius,
-      ]}
-      rotation={[0, angle, 0]}
-    >
-      <mesh position={[0, (C.railY + C.badgeY + C.connectorY) / 2, 0]}>
-        <boxGeometry
-          args={[C.strapWorldWidth, C.railY - C.badgeY - C.connectorY, 0.025]}
-        />
-        <meshStandardMaterial color={palette.text} roughness={0.9} />
-      </mesh>
-      <group
-        position={[0, C.badgeY, 0]}
-        onClick={(e) => {
-          e.stopPropagation();
-          onSelect(event.id);
-        }}
-      >
-        <BadgeArtwork event={event} palette={palette} />
+    <group ref={root}>
+      <group ref={pivot}>
+        <mesh ref={band} geometry={ribbon} frustumCulled={false}>
+          <meshBasicMaterial
+            color={fabricColor}
+            map={fabric}
+            side={DoubleSide}
+          />
+        </mesh>
+        <group ref={body}>
+          <BadgeArtwork
+            event={event}
+            palette={palette}
+            galleryMotion={artworkMotion}
+          />
+        </group>
       </group>
     </group>
   );
@@ -47,156 +183,48 @@ function StaticPass({ event, index, layout, palette, onSelect }) {
 export default function EventsScene({
   events,
   palette,
-  progress,
-  selection,
-  onSelect,
-  onSettled,
-  visible,
+  motion,
   reduced,
-  onDrag,
-  grip,
+  onProject,
 }) {
-  const gallery = useRef();
-  const cameraTarget = useRef(new Vector3(0, C.cameraAimY, 0));
-  const { camera, invalidate, setDpr, size } = useThree();
-  const single = events.length === 1;
-  const performance = useRef({ frames: 0, slow: 0, low: false });
-  const roughness = useMemo(() => {
-    const values = new Uint8Array(32 * 32 * 4);
-    for (let y = 0; y < 32; y++)
-      for (let x = 0; x < 32; x++) {
-        const p = (y * 32 + x) * 4;
-        const grain =
-          150 + Math.floor((Math.sin(y * 21.7 + x * 0.23) + 1) * 45);
-        values[p] = values[p + 1] = values[p + 2] = grain;
-        values[p + 3] = 255;
-      }
-    const texture = new DataTexture(values, 32, 32, RGBAFormat);
-    texture.wrapS = texture.wrapT = RepeatWrapping;
-    texture.repeat.set(12, 1);
-    texture.needsUpdate = true;
-    return texture;
-  }, []);
-  useEffect(() => () => roughness.dispose(), [roughness]);
-  const layout = galleryLayout(events.length);
-  const metal = new Color(palette.bg).lerp(new Color(palette.text), 0.19);
+  const { camera, size, invalidate } = useThree();
+  const rail = useRef();
   useEffect(() => {
-    if (!single) return;
-    const bottom = C.badgeY - C.badgeHeight / 2;
-    const height = C.railY - bottom;
+    const bottom = C.badgeY - C.badgeHeight / 2,
+      aim = (C.railY + bottom) / 2 + CAMERA_VERTICAL_OFFSET;
     const tangent = Math.tan((camera.fov * Math.PI) / 360);
     const distance = Math.max(
-      height / (2 * tangent * C.heroFill),
-      C.heroSafeWidth / (2 * tangent * (size.width / size.height)),
+      (C.railY - bottom) / (2 * tangent * CAMERA_FILL),
+      CAMERA_SAFE_WIDTH / (2 * tangent * (size.width / size.height)),
     );
-    const aim = (C.railY + bottom) / 2;
-    camera.position.set(0, aim, layout.radius + distance);
-    camera.lookAt(0, aim, layout.radius);
+    camera.position.set(0, aim, distance);
+    camera.lookAt(0, aim, 0);
     camera.updateProjectionMatrix();
     invalidate();
-  }, [single, size.width, size.height, camera, invalidate, layout.radius]);
-  useEffect(() => {
-    const index = Math.max(
-      0,
-      events.findIndex((event) => event.id === selection.selectedId),
-    );
-    const selecting = selection.mode === "SELECTING";
-    const returning = selection.mode === "RETURNING";
-    if (!selecting && !returning) return;
-    const bottom = C.badgeY - C.badgeHeight / 2;
-    const aim = (C.railY + bottom) / 2;
-    const tangent = Math.tan((camera.fov * Math.PI) / 360);
-    const fittedDistance = Math.max(
-      (C.railY - bottom) / (2 * tangent * C.heroFill),
-      C.heroSafeWidth / (2 * tangent * (size.width / size.height)),
-    );
-    const timeline = (window.gsap || gsap).timeline({
-      onUpdate: invalidate,
-      onComplete: () => onSettled(returning ? "RETURNED" : "SETTLED"),
-    });
-    timeline
-      .to(
-        gallery.current.rotation,
-        {
-          y: selecting ? -index * layout.step : progress.current.angle,
-          duration: reduced ? 0 : C.selectionDuration,
-          ease: "power2.inOut",
-        },
-        0,
-      )
-      .to(
-        camera.position,
-        {
-          z: selecting
-            ? layout.radius + fittedDistance
-            : layout.radius + C.browseDistance,
-          y: selecting ? aim : 1.1,
-          duration: reduced ? 0 : C.selectionDuration,
-          ease: "power2.inOut",
-        },
-        0,
-      );
-    timeline.to(
-      cameraTarget.current,
-      {
-        y: selecting ? aim : C.cameraAimY,
-        z: selecting ? layout.radius : 0,
-        duration: reduced ? 0 : C.selectionDuration,
-        ease: "power2.inOut",
-      },
-      0,
-    );
-    return () => timeline.kill();
-  }, [
-    selection.mode,
-    selection.selectedId,
-    events,
-    layout.step,
-    layout.radius,
-    camera,
-    invalidate,
-    onSettled,
-    reduced,
-    progress,
-    size.width,
-    size.height,
-  ]);
-  useFrame((_, delta) => {
-    if (!visible) return;
-    const stats = performance.current;
-    if (!stats.low) {
-      stats.frames++;
-      if (delta > C.slowFrameSeconds) stats.slow++;
-      if (stats.frames >= 120) {
-        if (stats.slow > 30) {
-          setDpr(1);
-          stats.low = true;
-        }
-        stats.frames = stats.slow = 0;
-      }
-    }
-    if (selection.mode === "BROWSING")
-      gallery.current.rotation.y = MathUtils.damp(
-        gallery.current.rotation.y,
-        progress.current.angle,
-        6,
-        delta,
-      );
-    if (!single) camera.lookAt(cameraTarget.current);
-  });
-  const physicsActive =
-    !reduced &&
-    [
-      "INTERACTIVE",
-      "OPENING_DETAILS",
-      "DETAILS_OPEN",
-      "CLOSING_DETAILS",
-    ].includes(selection.mode);
-  const selected = events.find((event) => event.id === selection.selectedId);
+  }, [camera, size.width, size.height, invalidate]);
+  useFrame(() => {
+    const state = motion.current,
+      width =
+        2 *
+        Math.tan((camera.fov * Math.PI) / 360) *
+        camera.position.z *
+        camera.aspect,
+      units = width / size.width;
+    rail.current.position.x =
+      (state.origin +
+        ((events.length - 1) * state.slot) / 2 -
+        state.current -
+        size.width / 2) *
+      units;
+    rail.current.scale.x =
+      (events.length - 1) * state.slot * units + width * 1.5;
+  }, -2);
+  const metal = useMemo(
+    () => new Color(palette.bg).lerp(new Color(palette.text), 0.19),
+    [palette],
+  );
   return (
     <>
-      <color attach="background" args={[palette.bg]} />
-      <fog attach="fog" args={[palette.bg, 15, 36]} />
       <ambientLight intensity={0.7} />
       <Environment resolution={128} frames={1}>
         <Lightformer
@@ -231,93 +259,21 @@ export default function EventsScene({
         intensity={C.fillLightIntensity}
         color={palette.text}
       />
-      <group ref={gallery}>
-        {single && (
-          <group position={[0, C.railY, layout.radius]}>
-            <mesh position={[0, 0.04, 0]}>
-              <boxGeometry args={[0.34, 0.1, 0.18]} />
-              <meshStandardMaterial
-                color={metal}
-                metalness={0.9}
-                roughness={0.3}
-              />
-            </mesh>
-            <mesh position={[0, 0.8, 0]}>
-              <cylinderGeometry args={[0.018, 0.018, 1.5, 8]} />
-              <meshStandardMaterial
-                color={metal}
-                metalness={0.8}
-                roughness={0.4}
-              />
-            </mesh>
-          </group>
-        )}
-        {!single && (
-          <mesh position={[0, C.railY, 0]} rotation={[Math.PI / 2, 0, 0]}>
-            <torusGeometry args={[layout.radius, C.railThickness, 12, 100]} />
-            <meshStandardMaterial
-              color={metal}
-              metalness={0.85}
-              roughness={0.32}
-              roughnessMap={roughness}
-            />
-          </mesh>
-        )}
-        {!single &&
-          [0, Math.PI / 2, Math.PI, Math.PI * 1.5].map((angle) => (
-            <mesh
-              key={angle}
-              position={[
-                Math.sin(angle) * layout.radius,
-                5.1,
-                Math.cos(angle) * layout.radius,
-              ]}
-            >
-              <cylinderGeometry args={[0.018, 0.018, 3.8, 6]} />
-              <meshStandardMaterial
-                color={metal}
-                metalness={0.8}
-                roughness={0.45}
-              />
-            </mesh>
-          ))}
-        {events
-          .filter(
-            (event) => !(physicsActive && event.id === selection.selectedId),
-          )
-          .map((event) => (
-            <StaticPass
-              key={event.id}
-              event={event}
-              index={events.indexOf(event)}
-              layout={layout}
-              palette={palette}
-              onSelect={onSelect}
-            />
-          ))}
-      </group>
-      {physicsActive && selected && (
-        <Suspense
-          fallback={
-            <StaticPass
-              event={selected}
-              index={0}
-              layout={layout}
-              palette={palette}
-              onSelect={() => {}}
-            />
-          }
-        >
-          <ActiveLanyard
-            event={selected}
-            radius={layout.radius}
-            palette={palette}
-            paused={selection.mode !== "INTERACTIVE" || !visible}
-            onDrag={onDrag}
-            grip={grip}
-          />
-        </Suspense>
-      )}
+      <mesh ref={rail} position={[0, C.railY + 0.04, 0]}>
+        <boxGeometry args={[1, 0.055, 0.09]} />
+        <meshStandardMaterial color={metal} metalness={0.9} roughness={0.3} />
+      </mesh>
+      {events.map((event, index) => (
+        <GalleryPass
+          key={event.id}
+          event={event}
+          index={index}
+          palette={palette}
+          motion={motion}
+          reduced={reduced}
+          onProject={onProject}
+        />
+      ))}
     </>
   );
 }
