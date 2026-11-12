@@ -63,8 +63,7 @@ function FocusRig({
     j3 = useRef(),
     body = useRef(),
     badge = useRef(),
-    band = useRef(),
-    elementRef = useRef(null);
+    band = useRef();
   const [dragging, setDragging] = useState(false);
   const phaseRef = useRef(phase);
   useEffect(() => {
@@ -202,7 +201,6 @@ function FocusRig({
   useEffect(() => {
     const element = grip.current,
       state = drag.current;
-    elementRef.current = element;
     if (!element) return;
     let bound = true;
     const release = () => {

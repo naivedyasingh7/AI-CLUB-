@@ -1,41 +1,13 @@
 export const EVENT_CONFIG = Object.freeze({
-  dpr: 1.5,
-  browseDistance: 11,
-  interactionDistance: 7.3,
-  cameraAimY: 0.9,
-  railThickness: 0.075,
-  ambientIntensity: 1.2,
   keyLightIntensity: 3,
   fillLightIntensity: 1.8,
-  rotationRadians: Math.PI * 2,
-  indicatorBreathSeconds: 3,
   railY: 3.2,
   badgeY: -0.65,
   baseRadius: 3.2,
   badgeWidth: 1.8,
   badgeHeight: 2.6,
-  cameraFov: 30,
   connectorY: 1.6,
-  heroFill: 0.76,
-  heroSafeWidth: 3.5,
-  strapWidth: 0.8,
   strapWorldWidth: 0.22,
-  introImpulse: 0.2,
-  facingSpring: 0.4,
-  selectionDuration: 1.05,
-  revealDuration: 1.25,
-  closeDuration: 0.7,
-  galleryScrollPerEvent: 250,
-  maximumPin: 1800,
-  gravity: -18,
-  linearDamping: 1.8,
-  angularDamping: 2.4,
-  ropeLength: 0.75,
-  strapSamples: 32,
-  maxDrag: 2.2,
-  pixelSize: 38,
-  glow: 0.25,
-  slowFrameSeconds: 0.035,
 });
 export function galleryLayout(count) {
   return {
@@ -112,7 +84,7 @@ export function safeEventUrl(url) {
     return null;
   }
 }
-export const TRANSITIONS = {
+const TRANSITIONS = {
   BROWSING: { SELECT: "SELECTING" },
   SELECTING: { SETTLED: "INTERACTIVE", CANCEL: "RETURNING" },
   INTERACTIVE: { EXPLORE: "OPENING_DETAILS", RETURN: "RETURNING" },

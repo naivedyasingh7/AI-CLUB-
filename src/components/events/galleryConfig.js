@@ -1,7 +1,5 @@
 // Reference defaults: davidfaure/horizontal-parallax-gallery-codrops, DOM and WebGL.
 export const SCROLL_EASE = 0.07;
-export const REFERENCE_DOM_SHIFT_PERCENT = 10;
-export const REFERENCE_DOM_IMAGE_SCALE = 1.25;
 export const PARALLAX_INTENSITY = 0.4;
 export const POSTER_UV_SCALE = 0.85;
 export const SHADER_MULTIPLIER = 1.0;

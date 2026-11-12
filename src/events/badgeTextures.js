@@ -36,7 +36,7 @@ export function defaultBadgeFace(title) {
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 
-export function badgeTexture(url, fallback, id) {
+function badgeTexture(url, fallback, id) {
   const key = `${url || ""}|${fallback}`;
   if (!textures.has(key)) {
     const loader = new TextureLoader();
