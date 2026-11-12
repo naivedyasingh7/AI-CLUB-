@@ -136,10 +136,12 @@ function GalleryPass({
       C.railY,
       selected ? 0 : -visual.current.focus * OTHERS_BACK,
     );
-    root.current.visible = !(selected && focus.physicsVisible);
     const opacity = selected
       ? 1
-      : 1 - (1 - OTHERS_OPACITY) * visual.current.focus;
+      : (1 - (1 - OTHERS_OPACITY) * visual.current.focus) *
+        (1 - visual.current.panel);
+    root.current.visible =
+      !(selected && focus.physicsVisible) && (selected || opacity > 0.001);
     if (Math.abs(lastOpacity.current - opacity) > 0.0001) {
       root.current.traverse((node) => {
         if (!node.isMesh) return;

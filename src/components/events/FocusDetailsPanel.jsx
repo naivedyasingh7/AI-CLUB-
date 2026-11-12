@@ -6,7 +6,7 @@ import {
   useRef,
 } from "react";
 import SplitType from "split-type";
-import PixelReveal from "./PixelReveal";
+import { eventCopy } from "../../data/events";
 import { calendarText, eventDateLabel, safeEventUrl } from "./eventModel";
 import {
   PANEL_SIDE,
@@ -16,22 +16,20 @@ import {
   PANEL_TEXT_DURATION,
   PANEL_TEXT_DELAY,
   PANEL_FOCUS_DELAY,
-  PIXEL_RESOLVE_DURATION,
   FOCUS_EASE,
 } from "./focusConfig";
 
 export default function FocusDetailsPanel({
   ref,
   event,
-  palette,
   reduced,
   mobile,
   onClose,
+  externalClose,
 }) {
   const panel = useRef(null),
     copy = useRef(null),
     close = useRef(null),
-    pixel = useRef(null),
     lines = useRef([]),
     calendarLink = useRef(null);
   const normalized = useMemo(
@@ -57,7 +55,6 @@ export default function FocusDetailsPanel({
       { types: "lines", lineClass: "focus-panel-line" },
     );
     lines.current = split.lines || [];
-    pixel.current?.draw(0.5);
     return () => {
       split.revert();
       lines.current = [];
@@ -71,7 +68,12 @@ export default function FocusDetailsPanel({
         panel.current.querySelectorAll(
           'button:not(:disabled),a[href],[tabindex="0"]',
         ),
-      ).filter((node) => node.getClientRects().length);
+      ).filter(
+        (node) =>
+          node.getClientRects().length &&
+          getComputedStyle(node).visibility !== "hidden",
+      );
+      if (!controls.length) return;
       const first = controls[0],
         last = controls.at(-1),
         outside = !panel.current.contains(document.activeElement);
@@ -92,6 +94,8 @@ export default function FocusDetailsPanel({
     ref,
     () => ({
       enter(timeline, at = 0) {
+        // Hand off the single visible Close control when the panel starts revealing.
+        timeline.set(externalClose.current, { autoAlpha: 0 }, at);
         const duration = reduced ? 0 : PANEL_REVEAL_DURATION;
         const hidden = mobile
           ? "inset(100% 0% 0% 0%)"
@@ -133,19 +137,13 @@ export default function FocusDetailsPanel({
           null,
           at + (reduced ? 0 : PANEL_FOCUS_DELAY),
         );
-        const reveal = { value: 0.5 };
-        timeline.to(
-          reveal,
-          {
-            value: 1,
-            duration: reduced ? 0 : PIXEL_RESOLVE_DURATION,
-            ease: "power2.out",
-            onUpdate: () => pixel.current?.draw(reveal.value),
-          },
-          at,
-        );
       },
       exit(timeline, at = 0) {
+        timeline.set(
+          externalClose.current,
+          { autoAlpha: 1 },
+          at + (reduced ? 0 : PANEL_EXIT_DURATION),
+        );
         timeline.to(
           panel.current,
           {
@@ -162,13 +160,13 @@ export default function FocusDetailsPanel({
         );
       },
     }),
-    [reduced, mobile],
+    [reduced, mobile, externalClose],
   );
   const placeholder = !!(event.isPlaceholder || event.development),
     registration = !placeholder && safeEventUrl(event.registrationUrl);
   const when = normalized.start
     ? eventDateLabel(normalized)
-    : "To be announced";
+    : eventCopy.unannounced;
   return (
     <aside
       ref={panel}
@@ -181,7 +179,7 @@ export default function FocusDetailsPanel({
       aria-describedby="focus-panel-description"
     >
       <header className="focus-panel-bar">
-        <span>{placeholder ? "DEVELOPMENT PREVIEW" : "AI CLUB / EVENTS"}</span>
+        <span>{placeholder ? eventCopy.preview : eventCopy.eyebrow}</span>
         <button ref={close} aria-label="Close event details" onClick={onClose}>
           Close <span aria-hidden="true">×</span>
         </button>
@@ -190,26 +188,21 @@ export default function FocusDetailsPanel({
         <div className="focus-panel-intro">
           <div>
             <h2 id="focus-panel-title" data-panel-reveal>
-              {event.title || "To be announced"}
+              {event.title || eventCopy.unannounced}
             </h2>
             <p className="focus-panel-tagline" data-panel-reveal>
-              {event.tagline || "To be announced"}
+              {event.tagline || eventCopy.unannounced}
             </p>
-          </div>
-          <div className="focus-panel-art">
-            <PixelReveal
-              ref={pixel}
-              src={event.posterSrc || event.poster || event.badgeFront}
-              palette={palette}
-              reduced={reduced}
-            />
           </div>
         </div>
         <dl className="focus-panel-facts">
           {[
-            ["WHEN", when],
-            ["WHERE", event.venue || "To be announced"],
-            ["BY", event.group || event.community || "To be announced"],
+            [eventCopy.when, when],
+            [eventCopy.where, event.venue || eventCopy.unannounced],
+            [
+              eventCopy.by,
+              event.group || event.community || eventCopy.unannounced,
+            ],
           ].map(([label, value]) => (
             <div key={label}>
               <dt>{label}</dt>
@@ -217,44 +210,49 @@ export default function FocusDetailsPanel({
             </div>
           ))}
         </dl>
-        <p
-          id="focus-panel-description"
-          className="focus-panel-description"
-          data-panel-reveal
+        <div
+          className="focus-panel-scroll"
+          tabIndex={0}
+          role="region"
+          aria-label="Event description and speakers"
         >
-          {event.description || "To be announced"}
-        </p>
-        {!!event.speakers?.length && (
-          <section className="focus-panel-speakers">
-            <h3 data-panel-reveal>Speakers</h3>
-            {event.speakers.map((person) => (
-              <p key={person.name} data-panel-reveal>
-                <strong>{person.name}</strong>
-                {person.role && <span>{person.role}</span>}
-              </p>
-            ))}
-          </section>
-        )}
-        <footer className="focus-panel-actions">
-          {registration ? (
-            <a href={registration} target="_blank" rel="noopener noreferrer">
-              Register ↗
-            </a>
-          ) : (
-            <button disabled>Register · TBA</button>
+          <p
+            id="focus-panel-description"
+            className="focus-panel-description"
+            data-panel-reveal
+          >
+            {event.description || eventCopy.unannounced}
+          </p>
+          {!!event.speakers?.length && (
+            <section className="focus-panel-speakers">
+              <h3 data-panel-reveal>{eventCopy.speakers}</h3>
+              {event.speakers.map((person) => (
+                <p key={person.name} data-panel-reveal>
+                  <strong>{person.name}</strong>
+                  {person.role && <span>{person.role}</span>}
+                </p>
+              ))}
+            </section>
           )}
-          {!placeholder && calendar ? (
-            <a ref={calendarLink} download={`${event.id}.ics`}>
-              Add to calendar
-            </a>
-          ) : (
-            <button disabled>Add to calendar · TBA</button>
-          )}
-          {placeholder && (
-            <small>Preview · booking and calendar unavailable</small>
-          )}
-        </footer>
+        </div>
       </div>
+      <footer className="focus-panel-actions">
+        {registration ? (
+          <a href={registration} target="_blank" rel="noopener noreferrer">
+            {eventCopy.register}
+          </a>
+        ) : (
+          <button disabled>{eventCopy.registerPending}</button>
+        )}
+        {!placeholder && calendar ? (
+          <a ref={calendarLink} download={`${event.id}.ics`}>
+            {eventCopy.calendar}
+          </a>
+        ) : (
+          <button disabled>{eventCopy.calendarPending}</button>
+        )}
+        {placeholder && <small>{eventCopy.previewActions}</small>}
+      </footer>
     </aside>
   );
 }

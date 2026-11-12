@@ -1,5 +1,20 @@
 import { DEV_DUMMY_LIMIT } from "../components/events/galleryConfig.js";
 
+export const eventCopy = {
+  unannounced: "To be announced",
+  preview: "DEVELOPMENT PREVIEW",
+  eyebrow: "AI CLUB / EVENTS",
+  when: "WHEN",
+  where: "WHERE",
+  by: "BY",
+  speakers: "Speakers",
+  register: "Register ↗",
+  registerPending: "Register · TBA",
+  calendar: "Add to calendar",
+  calendarPending: "Add to calendar · TBA",
+  previewActions: "Preview · booking and calendar unavailable",
+};
+
 /**
  * @typedef {Object} ClubEvent
  * @property {string} id Stable unique identifier.

@@ -427,6 +427,7 @@ function FocusRig({
             event={event}
             palette={palette}
             galleryMotion={artworkMotion}
+            pixelVisual={visual}
           />
         </group>
       </RigidBody>

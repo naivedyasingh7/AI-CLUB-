@@ -12,6 +12,7 @@ export const PANEL_TEXT_DURATION = 0.45;
 export const PANEL_TEXT_DELAY = 0.18;
 export const PANEL_FOCUS_DELAY = 0.08;
 export const PIXEL_RESOLVE_DURATION = 0.8;
+export const PIXEL_RESOLVE_SIZE = 38;
 export const STATIC_BLEND_DURATION = 0.55;
 export const HANDOFF_RENDER_DELAY = 0.05;
 export const GALLERY_RESTORE_DURATION = 0.75;

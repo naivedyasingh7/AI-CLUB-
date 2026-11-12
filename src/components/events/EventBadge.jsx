@@ -1,7 +1,9 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useGLTF, useTexture } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { Color, SRGBColorSpace } from "three";
+import { Color, SRGBColorSpace, Vector2 } from "three";
+import { applyPixelResolve } from "./pixelResolve";
+import { PIXEL_RESOLVE_SIZE } from "./focusConfig";
 import { FALLBACK_POSTER } from "./eventModel";
 import {
   PARALLAX_INTENSITY,
@@ -9,7 +11,19 @@ import {
   SHADER_MULTIPLIER,
   clamp,
 } from "./galleryConfig";
-export function BadgeArtwork({ event, palette, galleryMotion }) {
+export function BadgeArtwork({ event, palette, galleryMotion, pixelVisual }) {
+  const pixel = useRef({
+    uClubProgress: { value: 1 },
+    uClubPixelSize: { value: PIXEL_RESOLVE_SIZE },
+    uClubResolution: { value: new Vector2(240, 320) },
+    uClubBackground: { value: new Color(palette.bg) },
+  });
+  const compilePixel = useMemo(
+    () => (shader) => {
+      if (pixelVisual) applyPixelResolve(shader, pixel.current);
+    },
+    [pixelVisual],
+  );
   const { scene } = useGLTF("/models/events/ai-club-pass.glb");
   const [texture, back] = useTexture([
     event.badgeFront || event.posterSrc || event.poster || FALLBACK_POSTER,
@@ -32,7 +46,17 @@ export function BadgeArtwork({ event, palette, galleryMotion }) {
     });
     return () => maps.forEach((map) => map.dispose());
   }, [maps, galleryMotion]);
-  useFrame(() => {
+  useFrame(({ camera, size }) => {
+    if (pixelVisual) {
+      pixel.current.uClubProgress.value = pixelVisual.current.pixel;
+      const height =
+        (2 * Math.tan((camera.fov * Math.PI) / 360) * camera.position.z) /
+        camera.zoom;
+      pixel.current.uClubResolution.value.set(
+        (1.8 / height) * size.height,
+        (2.6 / height) * size.height,
+      );
+    }
     if (!galleryMotion) return;
     const margin = (1 - POSTER_UV_SCALE) / 2;
     const offset = clamp(
@@ -83,6 +107,10 @@ export function BadgeArtwork({ event, palette, galleryMotion }) {
           args={[Math.min(1.64, 2.14 * aspect), Math.min(2.14, 1.64 / aspect)]}
         />
         <meshPhysicalMaterial
+          onBeforeCompile={compilePixel}
+          customProgramCacheKey={() =>
+            pixelVisual ? "club-pixel-resolve-v1" : "club-badge-v1"
+          }
           map={maps[0]}
           roughness={0.42}
           metalness={0.05}

@@ -12,6 +12,7 @@ import { Canvas } from "@react-three/fiber";
 import {
   events as configuredEvents,
   eventsForGallery,
+  eventCopy,
 } from "../../data/events";
 import { useSmoothHorizontalScroll } from "../../hooks/useSmoothHorizontalScroll";
 import { DPR_CAP, CAMERA_FOV, LABEL_PARALLAX } from "./galleryConfig";
@@ -42,7 +43,9 @@ export default function EventsSection({
 }) {
   const events = useMemo(
     () =>
-      eventsForGallery(suppliedEvents, location.search, import.meta.env.DEV),
+      import.meta.env.DEV
+        ? eventsForGallery(suppliedEvents, location.search, true)
+        : suppliedEvents,
     [suppliedEvents],
   );
   const viewport = useRef(null),
@@ -53,6 +56,8 @@ export default function EventsSection({
     fallbackTrack = useRef(null),
     mainCanvas = useRef(null),
     emptyDown = useRef(null);
+  const labelLayer = useRef(null);
+  const focusClose = useRef(null);
   const cameraConfig = useMemo(
     () => ({ position: [0, 0.975, 13], fov: CAMERA_FOV }),
     [],
@@ -157,7 +162,6 @@ export default function EventsSection({
     passButtons,
     frame,
     reduced,
-    mobile,
     onLock: setScrollLocked,
   });
   const selected = focus.index === null ? null : events[focus.index];
@@ -166,6 +170,8 @@ export default function EventsSection({
     frame(motion.current);
   }, [failed, frame, motion]);
   const project = (index, x, y, a, b, c, d) => {
+    if (labelLayer.current)
+      labelLayer.current.style.opacity = String(1 - visual.current.panel);
     if (focusState.current.index === index && focusState.current.physicsVisible)
       return;
     const button = passButtons.current[index];
@@ -177,7 +183,8 @@ export default function EventsSection({
     button.style.opacity = String(
       focusState.current.index === index
         ? 1
-        : 1 - (1 - OTHERS_OPACITY) * visual.current.focus,
+        : (1 - (1 - OTHERS_OPACITY) * visual.current.focus) *
+            (1 - visual.current.panel),
     );
     if (
       focusState.current.index === index &&
@@ -248,15 +255,15 @@ export default function EventsSection({
         }}
       >
         <header className="gallery-heading">
-          <h1 id="events-heading">AI CLUB / EVENTS</h1>
-          <span>
+          <h1 id="events-heading">{eventCopy.eyebrow}</h1>
+          <span hidden={focus.panelMounted}>
             {String(
               focusActive ? focus.index + 1 : navigation.index + 1,
             ).padStart(2, "0")}{" "}
             / {String(events.length).padStart(2, "0")}
           </span>
         </header>
-        <div className="gallery-labels" aria-hidden="true">
+        <div ref={labelLayer} className="gallery-labels" aria-hidden="true">
           {events.map((event, index) => (
             <span
               key={event.id}
@@ -353,13 +360,14 @@ export default function EventsSection({
             <span className="gallery-pass-caption">
               <strong>{event.title}</strong>
               <small>
-                {event.isPlaceholder ? "DEVELOPMENT PREVIEW" : event.group}
+                {event.isPlaceholder ? eventCopy.preview : event.group}
               </small>
             </span>
           </button>
         ))}
         {focusActive && (
           <button
+            ref={focusClose}
             className="gallery-focus-close"
             aria-label="Close focused event"
             onClick={closeFocus}
@@ -408,10 +416,10 @@ export default function EventsSection({
           <FocusDetailsPanel
             ref={detailsPanel}
             event={selected}
-            palette={palette}
             reduced={reduced}
             mobile={mobile}
             onClose={closeFocus}
+            externalClose={focusClose}
           />
         )}
         <footer className="gallery-controls" hidden={focusActive}>

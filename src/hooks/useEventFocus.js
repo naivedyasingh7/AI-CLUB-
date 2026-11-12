@@ -20,6 +20,7 @@ import {
   DETAIL_BUTTON_RADIUS,
   FOCUS_EASE,
   REDUCED_TRANSITION_TICK,
+  PIXEL_RESOLVE_DURATION,
 } from "../components/events/focusConfig";
 
 const initial = {
@@ -42,7 +43,7 @@ export function useEventFocus({
   const [focus, setFocus] = useState(initial),
     [dragging, setDragging] = useState(false);
   const state = useRef(initial),
-    visual = useRef({ focus: 0, panel: 0, blend: 1 }),
+    visual = useRef({ focus: 0, panel: 0, blend: 1, pixel: 1 }),
     saved = useRef(null),
     rig = useRef(null),
     ready = useRef(false),
@@ -53,8 +54,7 @@ export function useEventFocus({
   const grip = useRef(null),
     details = useRef(null),
     connector = useRef(null),
-    panel = useRef(null),
-    hint = useRef(null);
+    panel = useRef(null);
   const commit = useCallback((patch) => {
     const next = { ...state.current, ...patch };
     state.current = next;
@@ -94,7 +94,7 @@ export function useEventFocus({
         target: motion.current.target,
       };
       gsap.set(motion.current, { target: motion.current.current, velocity: 0 });
-      Object.assign(visual.current, { focus: 0, panel: 0, blend: 1 });
+      Object.assign(visual.current, { focus: 0, panel: 0, blend: 1, pixel: 1 });
       onLock(true);
       commit({ ...initial, mode: "SELECTING", index });
     },
@@ -115,11 +115,9 @@ export function useEventFocus({
     const previous = {
       overflow: document.body.style.overflow,
       padding: document.body.style.paddingRight,
-      gutter: document.documentElement.style.scrollbarGutter,
     };
     const scrollbar = innerWidth - document.documentElement.clientWidth;
     if (scrollbar > 0) {
-      document.documentElement.style.scrollbarGutter = "stable";
       if (
         getComputedStyle(document.documentElement).scrollbarGutter !== "stable"
       )
@@ -137,12 +135,11 @@ export function useEventFocus({
       document.removeEventListener("keydown", escape, true);
       document.body.style.overflow = previous.overflow;
       document.body.style.paddingRight = previous.padding;
-      document.documentElement.style.scrollbarGutter = previous.gutter;
     };
   }, [active, close]);
   useEffect(() => {
     if (focus.mode === "FOCUSED")
-      details.current?.focus({ preventScroll: true });
+      (grip.current || details.current)?.focus({ preventScroll: true });
     if (focus.mode === "BROWSING" && restore.current) {
       const index = restore.current - 1;
       passButtons.current[index]?.focus({ preventScroll: true });
@@ -201,6 +198,16 @@ export function useEventFocus({
         });
         owned
           .addLabel("badge-aside", 0)
+          .fromTo(
+            visual.current,
+            { pixel: reduced ? 1 : 0.5 },
+            {
+              pixel: 1,
+              duration: duration(PIXEL_RESOLVE_DURATION),
+              ease: "power2.out",
+            },
+            "badge-aside",
+          )
           .to(
             visual.current,
             {
@@ -222,7 +229,12 @@ export function useEventFocus({
           onComplete: () => {
             const index = state.current.index;
             restore.current = index + 1;
-            Object.assign(visual.current, { focus: 0, panel: 0, blend: 1 });
+            Object.assign(visual.current, {
+              focus: 0,
+              panel: 0,
+              blend: 1,
+              pixel: 1,
+            });
             onLock(false);
             commit(initial);
             context.current?.clear();
@@ -338,9 +350,12 @@ export function useEventFocus({
         element.style.left = `${x}px`;
         element.style.top = `${y}px`;
         element.style.transform = `translate(-50%,-50%) matrix(${a},${b},${c},${d},0,0)`;
-        element.style.visibility = state.current.physicsVisible
-          ? "visible"
-          : "hidden";
+        // Publish the keyboard grip and its next Tab stop in the same frame.
+        element.style.visibility =
+          state.current.physicsVisible &&
+          (state.current.mode !== "FOCUSED" || details.current)
+            ? "visible"
+            : "hidden";
       }
       const halfWidth = Math.abs(a * 90) + Math.abs(c * 130),
         width = viewport.current?.clientWidth || innerWidth;
@@ -354,7 +369,8 @@ export function useEventFocus({
       if (details.current) {
         const firstProjection = details.current.style.visibility !== "visible";
         details.current.style.visibility = "visible";
-        if (firstProjection) details.current.focus({ preventScroll: true });
+        if (firstProjection)
+          (grip.current || details.current).focus({ preventScroll: true });
         details.current.style.left = `${buttonX}px`;
         details.current.style.top = `${y}px`;
       }
@@ -374,7 +390,7 @@ export function useEventFocus({
     timeline.current?.kill();
     rig.current?.stopDrag();
     if (saved.current) gsap.set(motion.current, saved.current);
-    Object.assign(visual.current, { focus: 0, panel: 0, blend: 1 });
+    Object.assign(visual.current, { focus: 0, panel: 0, blend: 1, pixel: 1 });
     onLock(false);
     commit(initial);
   }, [motion, onLock, commit]);
@@ -386,7 +402,6 @@ export function useEventFocus({
     details,
     connector,
     panel,
-    hint,
     select,
     close,
     open,

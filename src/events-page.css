@@ -1,4 +1,9 @@
+html:has(body.events-page) {
+  scrollbar-gutter: stable;
+}
 .events-page {
+  /* The legacy remote font faces reject cross-origin loads; use the same fallback directly. */
+  font-family: Arial, sans-serif;
   min-width: 0;
   margin: 0;
   background: var(--color-bg);
@@ -12,7 +17,7 @@
   justify-content: space-between;
   gap: 30px;
   padding: 24px 40px;
-  font-family: NeueHaasDisplay, sans-serif;
+  font-family: Arial, sans-serif;
 }
 .events-page-header img {
   width: 78px;
