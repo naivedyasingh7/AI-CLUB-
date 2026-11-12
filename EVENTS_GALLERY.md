@@ -1,5 +1,8 @@
 # Horizontal lanyard gallery — phase 1
 
+Event authoring has moved to [src/events/README.md](src/events/README.md).
+The data-path/schema notes below describe Phase 1's internal format.
+
 Historical Phase 1 notes. See [EVENTS_PHASE2.md](EVENTS_PHASE2.md) for the current
 focus, physics and details flow and its verification.
 

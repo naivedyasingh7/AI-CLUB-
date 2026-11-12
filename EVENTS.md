@@ -1,5 +1,8 @@
 # AI Club event archive
 
+> Current event-authoring instructions: [src/events/README.md](src/events/README.md).
+> Edit only `src/events/events.js`; the older paths/schema below are historical.
+
 > Current implementation: [EVENTS_PHASE2.md](EVENTS_PHASE2.md). The notes below
 > describe the earlier archive; the old full-screen details overlay is removed.
 

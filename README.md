@@ -1,5 +1,8 @@
 # React + Vite
 
+Adding a club event? Follow [the one-page event guide](src/events/README.md).
+Only edit `src/events/events.js` and upload artwork into `src/events/posters/`.
+
 This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
 Currently, two official plugins are available:
