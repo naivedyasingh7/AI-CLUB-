@@ -1,5 +1,9 @@
 # Events focus and details — phase 2
 
+See [EVENTS_POLISH.md](EVENTS_POLISH.md) for the subsequent panel/HUD polish and
+latest verification. Pixel resolve now runs on the badge face during its glide;
+the thumbnail and standalone PixelReveal renderer described below were removed.
+
 Branch: `feat/events-lanyard-gallery`. Open `/events.html`.
 
 Activate a badge to centre it, dim the other passes and enable one physical rig.
