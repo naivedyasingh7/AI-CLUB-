@@ -1,5 +1,10 @@
 # AI Club event archive
 
+> Current phase: the horizontal gallery on `feat/events-lanyard-gallery` supersedes
+> the hero selection/physics flow described below. See [EVENTS_GALLERY.md](EVENTS_GALLERY.md)
+> for current controls, reference defaults, changed files and verification. The
+> earlier detail/physics code remains available for phase 2 and is not mounted.
+
 Implemented on `feat/events-lanyard-experience`, based on the existing particle-loader work. The production website remains the static Vite page. This feature is a separate Events page at `/events.html`, linked beside Contact in the desktop, mobile and footer navigation. The home page does not mount or download the archive. The existing preloader, navigation, header, footer, and legacy scrolling scripts were not rewritten.
 
 ## What is included
