@@ -1,0 +1,402 @@
+/* Members section — data-layout="04".
+   Dark cinematic look that reuses the site's CSS variables and the .layout-head
+   treatment. Scoped under .members-* so it never leaks into other sections. */
+.members-section {
+  position: relative;
+  background: var(--color-bg);
+  color: var(--color-text);
+  overflow: hidden;
+}
+
+[data-members-loading] {
+  padding: var(--spacing);
+  font-family: FeatureMono, monospace;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  opacity: 0.55;
+}
+
+/* ---------- Team rail ---------- */
+
+.members-rail-wrap {
+  position: relative;
+  padding: 0 var(--spacing);
+  max-width: 100%;
+}
+
+.members-rail {
+  display: flex;
+  gap: clamp(16px, 4vw, 44px);
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-text) 30%, transparent)
+    var(--color-bg);
+}
+
+.members-rail::-webkit-scrollbar {
+  height: 8px;
+  background: var(--color-bg);
+}
+.members-rail::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-text) 25%, transparent);
+  border-radius: 4px;
+}
+
+.members-tab {
+  flex: none;
+  font: 900 clamp(26px, 5.5vw, 56px) / 1.1 NeueHaasDisplay, sans-serif;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--color-text);
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  padding: 0 0 12px 0;
+  cursor: pointer;
+  text-wrap: nowrap;
+  transition: border-color 0.2s ease;
+}
+
+.members-tab:hover {
+  border-bottom-color: color-mix(in srgb, var(--color-white) 40%, transparent);
+}
+
+.members-tab[aria-selected="true"] {
+  border-bottom-color: var(--color-white);
+}
+
+.members-tab:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 6px;
+  border-radius: 2px;
+}
+.members-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18px;
+  padding: 0 var(--spacing);
+}
+
+.members-nav button {
+  width: 44px;
+  height: 44px;
+  border: 1px solid color-mix(in srgb, var(--color-text) 20%, transparent);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 20px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.members-nav button:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+.members-nav button:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
+}
+.members-nav button:hover:not(:disabled) {
+  border-color: var(--color-text);
+}
+.members-nav button[aria-disabled="true"] {
+  pointer-events: none;
+}
+
+/* ---------- Team panel ---------- */
+
+.members-panel {
+  margin-top: 70px;
+  padding: 0 var(--spacing) var(--spacing) var(--spacing);
+}
+
+.members-team-name {
+  margin: 0;
+  font: 900 clamp(30px, 6vw, 52px) / 1.08 NeueHaasDisplay, sans-serif;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--color-white);
+}
+
+.members-tagline {
+  margin: 10px 0 0 0;
+  font-size: 18px;
+  color: color-mix(in srgb, var(--color-text) 65%, transparent);
+}
+
+.members-count {
+  margin: 8px 0 0 0;
+  font-family: FeatureMono, monospace;
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  opacity: 0.55;
+}
+
+.members-divider {
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, var(--color-text) 12%, transparent);
+  margin: 40px 0 0 0;
+}
+
+.members-role-group {
+  margin-top: 42px;
+}
+
+.members-role-label {
+  display: block;
+  font-family: FeatureMono, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  margin-bottom: 14px;
+}
+
+.members-lead-row,
+.members-people {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.members-lead-row {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+}
+
+/* ---------- Person card ---------- */
+
+.members-person {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid color-mix(in srgb, var(--color-text) 12%, transparent);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.members-person-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.members-person-trigger:hover {
+  background: color-mix(in srgb, var(--color-white) 6%, transparent);
+}
+.members-person-trigger:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
+}
+.members-person-trigger[aria-expanded="true"] {
+  background: color-mix(in srgb, var(--color-white) 10%, transparent);
+}
+
+.members-person-photo-wrap {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  flex: 0 0 56px;
+  border-radius: 10px;
+  background: #111;
+  overflow: hidden;
+}
+.members-person-photo-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.members-person-avatar {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: grid;
+  place-items: center;
+  font: 900 17px FeatureMono, monospace;
+  color: var(--color-white);
+}
+
+.members-person-name {
+  font: 700 17px / 1.25 NeueHaasDisplay, sans-serif;
+  color: var(--color-white);
+}
+.members-person-role {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.members-person-more {
+  margin-left: auto;
+  font-size: 16px;
+  opacity: 0.5;
+}
+
+/* Lead / Co-lead are shown larger. */
+.members-lead-card .members-person-trigger {
+  padding: 18px 20px;
+  gap: 22px;
+}
+.members-lead-card .members-person-photo-wrap {
+  width: 72px;
+  height: 72px;
+  flex: 0 0 72px;
+  border-radius: 12px;
+}
+.members-lead-card .members-person-avatar {
+  font-size: 22px;
+}
+.members-lead-card .members-person-name {
+  font-size: 21px;
+}
+.members-lead-card .members-person-role {
+  font-size: 13px;
+}
+
+/* ---------- Person details (expanded) ---------- */
+
+.members-details {
+  display: none;
+  border-top: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent);
+  padding: 14px 20px 20px 76px;
+  gap: 10px;
+}
+.members-lead-card .members-details {
+  padding-left: 96px;
+}
+
+.members-details.is-open {
+  display: grid;
+}
+
+.members-detail-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.members-detail-row .label {
+  flex: 0 0 auto;
+  width: 92px;
+  font-family: FeatureMono, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  color: var(--color-text);
+}
+.members-detail-row .value {
+  color: var(--color-white);
+  opacity: 0.85;
+}
+.members-detail-row .value.bio {
+  font-size: 14.5px;
+  white-space: pre-wrap;
+}
+
+.members-detail-links {
+  display: flex;
+  gap: 14px;
+}
+.members-detail-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-text);
+  text-decoration: none;
+  border: 1px solid color-mix(in srgb, var(--color-text) 20%, transparent);
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+.members-detail-links a:focus-visible,
+.members-detail-links a:hover {
+  border-color: var(--color-text);
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
+}
+.members-detail-links a svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 600px) {
+  .members-rail-wrap {
+    padding: 0 20px;
+  }
+  .members-tab {
+    font-size: clamp(22px, 10vw, 40px);
+    padding-bottom: 10px;
+  }
+  .members-panel {
+    margin-top: 50px;
+    padding: 0 20px 24px 20px;
+  }
+  .members-team-name {
+    font-size: clamp(26px, 9vw, 40px);
+  }
+  .members-lead-row {
+    flex-direction: column;
+    gap: 18px;
+  }
+  .members-person-trigger {
+    padding: 14px;
+    gap: 12px;
+  }
+  .members-person-photo-wrap {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+  }
+  .members-person-avatar {
+    font-size: 14px;
+  }
+  .members-person-name {
+    font-size: 15px;
+  }
+  .members-details,
+  .members-lead-card .members-details {
+    padding: 12px 16px 16px 60px;
+  }
+  .members-detail-row .label {
+    width: 72px;
+    font-size: 10px;
+  }
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .members-tab,
+  .members-person-trigger,
+  .members-nav button,
+  .members-detail-links a {
+    transition: none;
+    animation: none;
+  }
+  .members-details {
+    transition: none;
+  }
+}
+
