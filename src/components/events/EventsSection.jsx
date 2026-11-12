@@ -13,11 +13,12 @@ import {
   events as configuredEvents,
   eventsForGallery,
   eventCopy,
-} from "../../data/events";
+} from "../../events";
 import { useSmoothHorizontalScroll } from "../../hooks/useSmoothHorizontalScroll";
 import { DPR_CAP, CAMERA_FOV, LABEL_PARALLAX } from "./galleryConfig";
 import { useEventFocus } from "../../hooks/useEventFocus";
 import FocusDetailsPanel from "./FocusDetailsPanel";
+import { defaultBadgeFace } from "../../events/badgeTextures";
 import {
   EMPTY_CLICK_SLOP,
   OTHERS_OPACITY,
@@ -212,7 +213,16 @@ export default function EventsSection({
       {events.map((event) => (
         <div key={event.id}>
           <img
-            src={event.badgeFront || event.posterSrc}
+            src={
+              event.badgeFront ||
+              event.posterSrc ||
+              defaultBadgeFace(event.title)
+            }
+            onError={(e) => {
+              if (e.currentTarget.dataset.fallback) return;
+              e.currentTarget.dataset.fallback = "true";
+              e.currentTarget.src = defaultBadgeFace(event.title);
+            }}
             alt=""
             draggable="false"
           />

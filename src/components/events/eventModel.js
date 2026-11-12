@@ -37,7 +37,6 @@ export const EVENT_CONFIG = Object.freeze({
   glow: 0.25,
   slowFrameSeconds: 0.035,
 });
-export const FALLBACK_POSTER = "/img/events/archive-fallback.svg";
 export function galleryLayout(count) {
   return {
     radius: Math.max(EVENT_CONFIG.baseRadius, count * 0.58),

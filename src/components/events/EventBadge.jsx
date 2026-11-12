@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useRef } from "react";
-import { useGLTF, useTexture } from "@react-three/drei";
+import { use, useEffect, useMemo, useRef } from "react";
+import { useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { Color, SRGBColorSpace, Vector2 } from "three";
 import { applyPixelResolve } from "./pixelResolve";
 import { PIXEL_RESOLVE_SIZE } from "./focusConfig";
-import { FALLBACK_POSTER } from "./eventModel";
+import { badgeMaps, defaultBadgeFace } from "../../events/badgeTextures";
+import { BADGE_FACE } from "../../events/eventModel";
 import {
   PARALLAX_INTENSITY,
   POSTER_UV_SCALE,
@@ -25,10 +26,15 @@ export function BadgeArtwork({ event, palette, galleryMotion, pixelVisual }) {
     [pixelVisual],
   );
   const { scene } = useGLTF("/models/events/ai-club-pass.glb");
-  const [texture, back] = useTexture([
-    event.badgeFront || event.posterSrc || event.poster || FALLBACK_POSTER,
-    event.badgeBack || event.posterSrc || event.poster || FALLBACK_POSTER,
-  ]);
+  const fallback = useMemo(() => defaultBadgeFace(event.title), [event.title]);
+  const [texture, back] = use(
+    badgeMaps(
+      event.badgeFront || event.posterSrc,
+      event.badgeBack || event.posterSrc,
+      fallback,
+      event.id,
+    ),
+  );
   const maps = useMemo(
     () => (galleryMotion ? [texture.clone(), back.clone()] : [texture, back]),
     [texture, back, galleryMotion],
@@ -104,7 +110,10 @@ export function BadgeArtwork({ event, palette, galleryMotion, pixelVisual }) {
       <primitive object={model} dispose={null} />
       <mesh position={[0, -0.11, 0.073]}>
         <planeGeometry
-          args={[Math.min(1.64, 2.14 * aspect), Math.min(2.14, 1.64 / aspect)]}
+          args={[
+            Math.min(BADGE_FACE.width, BADGE_FACE.height * aspect),
+            Math.min(BADGE_FACE.height, BADGE_FACE.width / aspect),
+          ]}
         />
         <meshPhysicalMaterial
           onBeforeCompile={compilePixel}
@@ -122,8 +131,8 @@ export function BadgeArtwork({ event, palette, galleryMotion, pixelVisual }) {
       <mesh position={[0, -0.11, -0.073]} rotation={[0, Math.PI, 0]}>
         <planeGeometry
           args={[
-            Math.min(1.64, 2.14 * backAspect),
-            Math.min(2.14, 1.64 / backAspect),
+            Math.min(BADGE_FACE.width, BADGE_FACE.height * backAspect),
+            Math.min(BADGE_FACE.height, BADGE_FACE.width / backAspect),
           ]}
         />
         <meshPhysicalMaterial map={maps[1]} roughness={0.48} clearcoat={0.4} />

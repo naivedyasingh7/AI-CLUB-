@@ -6,7 +6,7 @@ import {
   useRef,
 } from "react";
 import SplitType from "split-type";
-import { eventCopy } from "../../data/events";
+import { eventCopy } from "../../events";
 import { eventDateLabel, safeEventUrl } from "./eventModel";
 import {
   PANEL_SIDE,

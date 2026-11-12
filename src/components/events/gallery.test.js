@@ -7,7 +7,9 @@ import {
   galleryMetrics,
   DEV_DUMMY_LIMIT,
 } from "./galleryConfig.js";
-import { events, eventsForGallery } from "../../data/events.js";
+import { events as entries } from "../../events/events.js";
+import { eventsForGallery, prepareEvents } from "../../events/eventModel.js";
+const events = prepareEvents(entries, { development: true });
 
 test("scroll smoothing covers the same distance at 60 and 144Hz", () => {
   const advance = (hz) => {

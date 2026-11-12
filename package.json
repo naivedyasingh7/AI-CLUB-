@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:events": "node scripts/check-events.mjs",
+    "prebuild": "npm run check:events",
+    "test": "node --test src/components/events/*.test.js src/events/*.test.js"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.9",
