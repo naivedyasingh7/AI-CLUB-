@@ -37,7 +37,7 @@ remain so the archive is not empty.
   slashes or uppercase extensions. Upload it to `src/events/posters/` and set
   `poster: "intro-to-llms.webp"`. Never write paths or imports.
 - Missing/failed artwork uses the club's existing logo plus the event title.
-  Leave `club-logo.svg` and the existing preview files alone.
+  Leave the existing preview files alone; the fallback reuses the club logo asset.
 
 ### 3. Check it locally
 

@@ -1,8 +1,8 @@
 # AI Club pass assets
 
 Event artwork is now stored in `src/events/posters/`. The preview SVGs were moved
-without changing their bytes. `club-logo.svg` there is an unchanged copy of the
-existing `public/img/svg/ai-club-logo-custom.svg`, used by the missing-poster face.
+without changing their bytes. The missing-poster face imports the existing
+`public/img/svg/ai-club-logo-custom.svg` directly; no duplicate logo is maintained.
 
 `ai-club-pass.glb` is original geometry generated for this project by
 `scripts/build-event-badge.mjs`. It includes a bevelled laminated shell with a

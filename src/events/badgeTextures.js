@@ -1,5 +1,5 @@
 import { TextureLoader, SRGBColorSpace } from "three";
-import logo from "./posters/club-logo.svg?raw";
+import logo from "../../public/img/svg/ai-club-logo-custom.svg?raw";
 import { POSTER_SPEC } from "./eventModel.js";
 
 const textures = new Map();
