@@ -12,8 +12,8 @@ try {
   result.warnings.forEach((message) => console.warn(message));
   if (result.errors.length) process.exitCode = 1;
   else
-    console.log(
-      `Event check passed: ${events.length} entries. Dates use India time; posters are ready.`,
+    process.stdout.write(
+      `Event check passed: ${events.length} entries. Dates use India time; posters are ready.\n`,
     );
 } catch (error) {
   console.error(

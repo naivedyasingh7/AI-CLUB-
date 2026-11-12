@@ -82,4 +82,4 @@ await writeFile(
   new URL("../public/models/events/ai-club-pass.glb", import.meta.url),
   Buffer.from(output),
 );
-console.log(`Wrote original badge GLB (${output.byteLength} bytes).`);
+process.stdout.write(`Wrote original badge GLB (${output.byteLength} bytes).\n`);
