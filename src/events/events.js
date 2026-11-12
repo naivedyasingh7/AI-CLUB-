@@ -24,13 +24,13 @@ Everything except id, title and start may be left out. Do not add a status field
 export const events = [
   {
     id: "development-preview",
-    title: "The next chapter.",
+    title: "Cute dog",
     start: null,
-    tagline: "A place for what comes next.",
+    tagline: "who doesnt love dog",
     group: "AI Club · VIT Bhopal",
     description:
       "This is a development preview of the AI Club event archive. The club has not supplied an event announcement yet. The title, artwork and pass are placeholders; date, venue and registration will appear here when confirmed.",
-    poster: "badge-preview.svg",
+    poster: "dog.jpg",
     accent: "orange",
     placeholder: true,
   },
