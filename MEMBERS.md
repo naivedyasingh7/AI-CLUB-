@@ -3,27 +3,40 @@
 Branch: `feat/members-section`. This pass completes the Members section on the
 home page (`data-layout="04"`), introducing an executive Board showcase, a
 pinned scroll-driven horizontal track for team names, and typography-first team
-person cards.
+person cards with a dark, cinematic aesthetic inspired by hackfirst.io.
 
 ## Changes
 
-### Change 1: Pinned horizontal scroll for team names
+### Change 1: Pinned horizontal scroll for team names & cinematic dropdown
 - `src/members/MembersSection.jsx` — Desktop (≥768px, no reduced-motion) uses
   GSAP ScrollTrigger to pin `.members-stage` when reaching the top of the
   viewport (`start: "top top"`).
 - Vertical scroll slides the team names horizontally across the viewport,
-  centering the active team and revealing its Lead, Co-lead, and members below.
+  centering the active team.
+- **Per-tab scale and opacity gradient:** Tabs scale and fade based on their
+  distance from the viewport center (`scale: 1 - 0.42 * t`, `opacity: 1 - 0.78 * t`),
+  drawing visual focus sharply to the active team.
+- **Dropdown panel reveal:** On team switch, the panel reveals downward via a GSAP
+  `clip-path` wipe (`inset(0 0 100% 0 round 0px)` → `inset(0 0 0% 0 round 0px)` in 0.55s `power3.out`),
+  giving the visual impression of content dropping down from the active team header.
+- **SplitType character line-mask:** Lead and co-lead names animate character-by-character
+  (`yPercent: 110` → `0`, staggered by 0.022s in `power4.out`), masked cleanly by the overflow boundary.
+- **Editorial layout:**
+  - Pinned stage header (top-right): minimalist counter (`01 / 05`) and circular nav buttons (`←`, `→`).
+  - Leaders block: Lead and Co-lead displayed prominently side-by-side with oversized typography.
+  - Directory: Clean list layout separated by subtle 1px rules with right-aligned metadata (`CSE · 3rd Year`).
+  - Progress dots: Bottom-centered indicators with animated pill expansion on active index.
 - Scroll snapping lands cleanly on each team (`snapTo: 1 / (teamCount - 1)`).
 - Scroll distance is tuned per team (`(teamCount - 1) * Math.max(500, Math.round(window.innerHeight * 0.75))`).
 - Full bidirectional synchronization: clicking a team name, the arrow buttons,
-  or using Left/Right/Home/End keys smoothly scrolls the window to the exact
+  the progress dots, or using Left/Right/Home/End keys smoothly scrolls the window to the exact
   pinned progress point.
 - Pinned stage height remains locked at `100svh`. Internal scroll on
-  `.members-panel` (`overflow-y: auto`) accommodates large rosters (e.g. 40
+  `.members-panel-scroll` (`overflow-y: auto`, with bottom mask fade) accommodates large rosters (e.g. 40
   members) and expanding disclosures without stage height jitter.
 - Fallback for small screens (<768px) and `prefers-reduced-motion`: unpinned
   normal page scrolling with a touch-scrollable horizontal swipe rail.
-- Lifecycle cleanup: kills ScrollTrigger instances, disconnects listeners, and
+- Lifecycle cleanup: reverts SplitType instances, kills ScrollTrigger instances, disconnects listeners, and
   calls `ScrollTrigger.refresh()` (both local and global `window.ScrollTrigger`)
   to ensure sticky layout title/counter (`data-layout="04"`) in `animate.js`
   re-measures the section height accurately.
@@ -75,7 +88,9 @@ person cards.
 | `src/members/MembersSection.jsx` | `scrollDistance` | `(teamCount - 1) * Math.max(500, 0.75vh)` | Vertical scroll travel per team |
 | `src/members/MembersSection.jsx` | `snap.duration` | 0.15s – 0.35s | Snapping duration |
 | `src/members/MembersSection.jsx` | `scrub` | 0.4s | Scrub lag for track slide |
-| `src/members/MembersSection.jsx` | panel reveal | 0.3s `power2.out` | Subtle panel switch transition |
+| `src/members/MembersSection.jsx` | `updateTabVisuals` | scale: `1 - 0.42*t`, opacity: `1 - 0.78*t` | Tab distance-based scale/opacity falloff |
+| `src/members/MembersSection.jsx` | panel dropdown reveal | 0.55s `power3.out` `clip-path` wipe | Top-to-bottom dropdown panel appearance |
+| `src/members/MembersSection.jsx` | SplitType character reveal | 0.65s `power4.out`, 0.022s stagger | Line-masked character reveal for leader names |
 | `src/members/members.css` | `--spacing`, `clamp()` | Responsive scales | Fluid typography & track spacing |
 
 ## Verification actually run
