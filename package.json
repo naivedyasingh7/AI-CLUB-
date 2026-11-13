@@ -9,8 +9,9 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "check:events": "node scripts/check-events.mjs",
-    "prebuild": "npm run check:events",
-    "test": "node --test src/components/events/*.test.js src/events/*.test.js"
+    "check:members": "node scripts/check-members.mjs",
+    "prebuild": "npm run check:events && npm run check:members",
+    "test": "node --test src/components/events/*.test.js src/events/*.test.js src/members/*.test.js"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.9",

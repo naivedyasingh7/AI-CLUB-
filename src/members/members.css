@@ -1,0 +1,737 @@
+/* Members section — data-layout="04".
+   Dark cinematic look inspired by hackfirst.io that reuses the site's CSS variables
+   and the .layout-head treatment. Scoped under .members-* so it never leaks. */
+.members-section {
+  position: relative;
+  background: var(--color-bg);
+  color: var(--color-text);
+  overflow: hidden;
+}
+
+[data-members-loading] {
+  padding: var(--spacing);
+  font-family: FeatureMono, monospace;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  opacity: 0.55;
+}
+
+/* ==========================================================================
+   CHANGE 2: Board section (Normal page flow above pinned team stage)
+   ========================================================================== */
+
+.members-board-section {
+  padding: 48px var(--spacing) 64px var(--spacing);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-text) 12%, transparent);
+}
+
+.members-board-header {
+  margin-bottom: 36px;
+  text-align: center;
+}
+
+.members-board-title {
+  margin: 0;
+  font: 900 clamp(28px, 4.5vw, 44px) / 1.1 NeueHaasDisplay, sans-serif;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--color-white);
+}
+
+.members-board-subtitle {
+  margin: 8px 0 0 0;
+  font-family: FeatureMono, monospace;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  color: var(--color-text);
+}
+
+/* Desktop: centered row, wraps to two rows above 5 */
+.members-board-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: clamp(20px, 3vw, 36px);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.members-board-card {
+  flex: 0 1 180px;
+  width: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.members-board-photo-wrap {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #111;
+  position: relative;
+  border: 1px solid color-mix(in srgb, var(--color-text) 14%, transparent);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.members-board-photo-wrap img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  z-index: 2;
+  transition: transform 0.4s ease;
+}
+
+.members-board-card:hover .members-board-photo-wrap img {
+  transform: scale(1.05);
+}
+
+.members-board-avatar {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background: linear-gradient(145deg, #181818, #282828);
+  display: grid;
+  place-items: center;
+  font: 900 28px FeatureMono, monospace;
+  color: var(--color-white);
+  letter-spacing: 0.05em;
+}
+
+.members-board-info {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.members-board-name {
+  font: 700 16px / 1.25 NeueHaasDisplay, sans-serif;
+  color: var(--color-white);
+  word-break: break-word;
+}
+
+.members-board-designation {
+  font-family: FeatureMono, monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-text) 70%, transparent);
+  line-height: 1.3;
+}
+
+.members-board-links {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.members-board-link {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-white) 6%, transparent);
+  color: var(--color-text);
+  border: 1px solid color-mix(in srgb, var(--color-text) 15%, transparent);
+  transition: all 0.2s ease;
+}
+
+.members-board-link:hover {
+  color: var(--color-white);
+  background: color-mix(in srgb, var(--color-white) 16%, transparent);
+  border-color: var(--color-white);
+  transform: translateY(-2px);
+}
+
+.members-board-link:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   CHANGE 1: Pinned Horizontal Scroll Team Stage (hackfirst.io style)
+   ========================================================================== */
+
+.members-stage {
+  position: relative;
+  background: var(--color-bg);
+  box-sizing: border-box;
+}
+
+/* Stage header - absolute top right */
+.members-stage-header {
+  position: absolute;
+  top: 24px;
+  right: var(--spacing);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 10;
+}
+
+.members-stage-counter {
+  font-family: FeatureMono, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.4;
+  color: var(--color-white);
+}
+
+.members-stage-nav-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  line-height: 1;
+  transition: all 0.2s ease;
+}
+
+.members-stage-nav-btn:disabled {
+  opacity: 0.2;
+  cursor: default;
+}
+
+.members-stage-nav-btn:hover:not(:disabled) {
+  border-color: var(--color-white);
+  color: var(--color-white);
+  transform: scale(1.05);
+}
+
+.members-stage-nav-btn:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
+}
+
+/* Rail */
+.members-rail-outer {
+  flex: 0 0 auto;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: 56px 0 24px 0;
+  position: relative;
+}
+
+.members-rail-track {
+  display: flex;
+  align-items: baseline;
+  width: max-content;
+}
+
+.members-tablist {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(32px, 6vw, 76px);
+  padding: 0 var(--spacing);
+}
+
+.members-tab {
+  flex: none;
+  font: 900 clamp(44px, 8.5vw, 92px) / 1.05 NeueHaasDisplay, sans-serif;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  color: var(--color-white);
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  transform-origin: center bottom;
+  white-space: nowrap;
+  outline: none;
+}
+
+.members-tab:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 6px;
+  border-radius: 2px;
+}
+
+/* Thin horizontal rule separating rail from dropdown panel */
+.members-panel-divider {
+  flex: 0 0 1px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Panel */
+.members-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  position: relative;
+}
+
+.members-panel-scroll {
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+  mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+}
+
+.members-panel-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.members-panel-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+}
+
+.members-panel-inner {
+  padding: 36px var(--spacing) 72px var(--spacing);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Leaders Side-by-Side */
+.members-leaders {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 40px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 40px;
+}
+
+.members-leader {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.members-leader-label {
+  font-family: FeatureMono, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.45;
+  color: var(--color-text);
+}
+
+.members-leader-trigger {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+}
+
+.members-leader-trigger:hover .members-leader-name {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.members-leader-trigger:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 4px;
+}
+
+.members-leader-name {
+  font: 800 clamp(26px, 4vw, 48px) / 1.1 NeueHaasDisplay, sans-serif;
+  letter-spacing: -0.02em;
+  color: var(--color-white);
+  overflow: hidden; /* Clips SplitType chars on entrance */
+  display: inline-block;
+}
+
+.members-leader-name .char {
+  display: inline-block;
+}
+
+.members-leader-chevron {
+  font-size: 14px;
+  opacity: 0.4;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+/* Directory List */
+.members-directory {
+  display: flex;
+  flex-direction: column;
+}
+
+.members-dir-header {
+  font-family: FeatureMono, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.45;
+  color: var(--color-text);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.members-dir-header::after {
+  content: "";
+  display: block;
+  height: 1px;
+  flex: 1;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.members-dir-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.members-dir-item {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.members-dir-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.members-dir-trigger:disabled {
+  cursor: default;
+}
+
+.members-dir-trigger:not(:disabled):hover {
+  opacity: 0.75;
+}
+
+.members-dir-trigger:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
+}
+
+.members-dir-name {
+  font: 500 16px / 1.3 NeueHaasDisplay, sans-serif;
+  color: var(--color-white);
+}
+
+.members-dir-meta {
+  font-family: FeatureMono, monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.45;
+  margin-left: auto;
+}
+
+.members-dir-chevron {
+  font-size: 12px;
+  opacity: 0.4;
+  margin-left: 12px;
+  flex-shrink: 0;
+}
+
+/* Disclosure details (shared) */
+.members-expanded {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 0 20px 0;
+  overflow: hidden;
+}
+
+.members-detail-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.members-detail-row .label {
+  flex: 0 0 96px;
+  font-family: FeatureMono, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.45;
+  color: var(--color-text);
+}
+
+.members-detail-row .value {
+  color: rgba(255, 255, 255, 0.85);
+  flex: 1;
+}
+
+.members-detail-row .value.bio {
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.members-detail-links {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.members-detail-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-text);
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  padding: 5px 10px;
+  transition: all 0.2s ease;
+  font-family: FeatureMono, monospace;
+  letter-spacing: 0.08em;
+}
+
+.members-detail-links a:hover,
+.members-detail-links a:focus-visible {
+  color: var(--color-white);
+  border-color: rgba(255, 255, 255, 0.45);
+  outline: none;
+}
+
+.members-empty {
+  font-family: FeatureMono, monospace;
+  font-size: 13px;
+  opacity: 0.5;
+  letter-spacing: 0.1em;
+}
+
+/* Progress dots */
+.members-progress {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  z-index: 5;
+}
+
+.members-progress-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.members-progress-dot.is-active {
+  background: var(--color-white);
+  transform: scaleX(2.5);
+  border-radius: 3px;
+}
+
+/* ==========================================================================
+   Desktop Pinned Stage Rules (>=768px)
+   ========================================================================== */
+
+@media (min-width: 768px) {
+  .members-stage {
+    height: 100svh;
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+}
+
+/* ==========================================================================
+   Mobile (<768px): Normal page scrolling, native swipe rail
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  .members-board-section {
+    padding: 32px 20px 48px 20px;
+  }
+
+  .members-board-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .members-board-grid > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    max-width: 180px;
+    margin: 0 auto;
+  }
+
+  .members-board-card {
+    width: 100%;
+    flex: auto;
+  }
+
+  .members-board-photo-wrap {
+    border-radius: 10px;
+  }
+
+  .members-board-avatar {
+    font-size: 22px;
+  }
+
+  .members-board-name {
+    font-size: 14px;
+  }
+
+  .members-board-designation {
+    font-size: 10px;
+  }
+
+  /* Team Stage: Unpinned, native horizontal rail */
+  .members-stage {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+  }
+
+  .members-stage-header {
+    position: relative;
+    top: auto;
+    right: auto;
+    padding: 24px 20px 0 20px;
+    justify-content: flex-end;
+  }
+
+  .members-rail-outer {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    padding: 24px 0 20px 0;
+  }
+
+  .members-rail-track {
+    transform: none !important;
+  }
+
+  .members-tablist {
+    padding: 0 20px;
+    gap: 24px;
+  }
+
+  .members-tab {
+    font-size: clamp(28px, 8vw, 44px);
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .members-panel {
+    min-height: auto;
+    overflow: visible;
+  }
+
+  .members-panel-scroll {
+    height: auto;
+    overflow: visible;
+    mask-image: none;
+  }
+
+  .members-panel-inner {
+    padding: 28px 20px 56px 20px;
+  }
+
+  .members-leaders {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding-bottom: 28px;
+    margin-bottom: 28px;
+  }
+
+  .members-leader-name {
+    font-size: clamp(24px, 7vw, 36px);
+  }
+
+  .members-progress {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Reduced Motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .members-tab,
+  .members-stage-nav-btn,
+  .members-progress-dot,
+  .members-leader-trigger,
+  .members-dir-trigger,
+  .members-board-link,
+  .members-board-photo-wrap img {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .members-stage {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .members-panel {
+    overflow: visible !important;
+    min-height: auto !important;
+  }
+
+  .members-panel-scroll {
+    overflow: visible !important;
+    mask-image: none !important;
+  }
+
+  .members-rail-outer {
+    overflow-x: auto !important;
+  }
+
+  .members-rail-track {
+    transform: none !important;
+  }
+
+  .members-panel-inner {
+    clip-path: none !important;
+    opacity: 1 !important;
+  }
+}
