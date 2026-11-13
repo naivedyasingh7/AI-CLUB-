@@ -1,6 +1,6 @@
 /* Members section — data-layout="04".
-   Dark cinematic look that reuses the site's CSS variables and the .layout-head
-   treatment. Scoped under .members-* so it never leaks into other sections. */
+   Dark cinematic look inspired by hackfirst.io that reuses the site's CSS variables
+   and the .layout-head treatment. Scoped under .members-* so it never leaks. */
 .members-section {
   position: relative;
   background: var(--color-bg);
@@ -163,63 +163,104 @@
 }
 
 /* ==========================================================================
-   CHANGE 1: Pinned Horizontal Scroll Team Stage (Desktop >=768px)
+   CHANGE 1: Pinned Horizontal Scroll Team Stage (hackfirst.io style)
    ========================================================================== */
 
 .members-stage {
   position: relative;
-  width: 100%;
   background: var(--color-bg);
   box-sizing: border-box;
 }
 
-.members-rail-wrap {
-  position: relative;
-  padding: 0 var(--spacing);
-  max-width: 100%;
-  box-sizing: border-box;
+/* Stage header - absolute top right */
+.members-stage-header {
+  position: absolute;
+  top: 24px;
+  right: var(--spacing);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 10;
 }
 
-.members-rail-container {
+.members-stage-counter {
+  font-family: FeatureMono, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.4;
+  color: var(--color-white);
+}
+
+.members-stage-nav-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  line-height: 1;
+  transition: all 0.2s ease;
+}
+
+.members-stage-nav-btn:disabled {
+  opacity: 0.2;
+  cursor: default;
+}
+
+.members-stage-nav-btn:hover:not(:disabled) {
+  border-color: var(--color-white);
+  color: var(--color-white);
+  transform: scale(1.05);
+}
+
+.members-stage-nav-btn:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
+}
+
+/* Rail */
+.members-rail-outer {
+  flex: 0 0 auto;
   width: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: 56px 0 24px 0;
   position: relative;
 }
 
 .members-rail-track {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   width: max-content;
 }
 
 .members-tablist {
   display: flex;
-  align-items: center;
-  gap: clamp(20px, 4vw, 48px);
+  align-items: baseline;
+  gap: clamp(32px, 6vw, 76px);
+  padding: 0 var(--spacing);
 }
 
 .members-tab {
   flex: none;
-  font: 900 clamp(28px, 5vw, 56px) / 1.1 NeueHaasDisplay, sans-serif;
-  letter-spacing: -0.01em;
+  font: 900 clamp(44px, 8.5vw, 92px) / 1.05 NeueHaasDisplay, sans-serif;
+  letter-spacing: -0.025em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--color-text) 35%, transparent);
+  color: var(--color-white);
   background: transparent;
   border: 0;
-  border-bottom: 3px solid transparent;
-  padding: 0 4px 12px 4px;
+  padding: 0;
   cursor: pointer;
+  transform-origin: center bottom;
   white-space: nowrap;
-  transition: color 0.2s ease, border-color 0.2s ease;
-}
-
-.members-tab:hover {
-  color: color-mix(in srgb, var(--color-white) 75%, transparent);
-}
-
-.members-tab[aria-selected="true"],
-.members-tab.is-active {
-  color: var(--color-white);
-  border-bottom-color: var(--color-white);
+  outline: none;
 }
 
 .members-tab:focus-visible {
@@ -228,279 +269,300 @@
   border-radius: 2px;
 }
 
-.members-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 18px;
-  padding: 0;
+/* Thin horizontal rule separating rail from dropdown panel */
+.members-panel-divider {
+  flex: 0 0 1px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
 }
 
-.members-nav button {
-  width: 44px;
-  height: 44px;
-  border: 1px solid color-mix(in srgb, var(--color-text) 20%, transparent);
-  border-radius: 8px;
-  background: transparent;
-  color: var(--color-text);
-  font-size: 20px;
-  cursor: pointer;
+/* Panel */
+.members-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  position: relative;
+}
+
+.members-panel-scroll {
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+  mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+}
+
+.members-panel-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.members-panel-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+}
+
+.members-panel-inner {
+  padding: 36px var(--spacing) 72px var(--spacing);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Leaders Side-by-Side */
+.members-leaders {
   display: grid;
-  place-items: center;
-  transition: border-color 0.2s ease, color 0.2s ease;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 40px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 40px;
 }
 
-.members-nav button:disabled {
-  opacity: 0.25;
-  cursor: default;
+.members-leader {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.members-nav button:focus-visible {
-  outline: 2px solid var(--color-text);
-  outline-offset: 2px;
-}
-
-.members-nav button:hover:not(:disabled) {
-  border-color: var(--color-white);
-  color: var(--color-white);
-}
-
-.members-nav-count {
-  font-family: FeatureMono, monospace;
-  font-size: 13px;
-  letter-spacing: 0.16em;
-  opacity: 0.6;
-}
-
-/* ---------- Team panel ---------- */
-
-.members-team-name {
-  margin: 0;
-  font: 900 clamp(30px, 5.5vw, 52px) / 1.08 NeueHaasDisplay, sans-serif;
-  letter-spacing: -0.01em;
-  text-transform: uppercase;
-  color: var(--color-white);
-}
-
-.members-tagline {
-  margin: 10px 0 0 0;
-  font-size: 18px;
-  color: color-mix(in srgb, var(--color-text) 65%, transparent);
-}
-
-.members-count {
-  margin: 8px 0 0 0;
-  font-family: FeatureMono, monospace;
-  font-size: 13px;
-  letter-spacing: 0.16em;
-  opacity: 0.55;
-}
-
-.members-divider {
-  border: 0;
-  border-top: 1px solid color-mix(in srgb, var(--color-text) 12%, transparent);
-  margin: 32px 0 0 0;
-}
-
-.members-role-group {
-  margin-top: 36px;
-}
-
-.members-role-label {
-  display: block;
+.members-leader-label {
   font-family: FeatureMono, monospace;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  opacity: 0.55;
-  margin-bottom: 14px;
+  opacity: 0.45;
+  color: var(--color-text);
 }
 
-.members-lead-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
-}
-
-.members-people {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+.members-leader-trigger {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
   gap: 16px;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
 }
 
-/* ==========================================================================
-   CHANGE 3: Team Person card (NO photos)
-   ========================================================================== */
+.members-leader-trigger:hover .members-leader-name {
+  color: rgba(255, 255, 255, 0.85);
+}
 
-.members-person {
+.members-leader-trigger:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 4px;
+}
+
+.members-leader-name {
+  font: 800 clamp(26px, 4vw, 48px) / 1.1 NeueHaasDisplay, sans-serif;
+  letter-spacing: -0.02em;
+  color: var(--color-white);
+  overflow: hidden; /* Clips SplitType chars on entrance */
+  display: inline-block;
+}
+
+.members-leader-name .char {
+  display: inline-block;
+}
+
+.members-leader-chevron {
+  font-size: 14px;
+  opacity: 0.4;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+/* Directory List */
+.members-directory {
   display: flex;
   flex-direction: column;
-  border: 1px solid color-mix(in srgb, var(--color-text) 12%, transparent);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--color-white) 2%, transparent);
-  overflow: hidden;
-  transition: border-color 0.2s ease, background 0.2s ease;
 }
 
-.members-person:hover {
-  border-color: color-mix(in srgb, var(--color-text) 24%, transparent);
-  background: color-mix(in srgb, var(--color-white) 4%, transparent);
+.members-dir-header {
+  font-family: FeatureMono, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.45;
+  color: var(--color-text);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.members-person-trigger {
+.members-dir-header::after {
+  content: "";
+  display: block;
+  height: 1px;
+  flex: 1;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.members-dir-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.members-dir-item {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.members-dir-trigger {
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 16px 20px;
-  border: 0;
+  padding: 14px 0;
   background: transparent;
+  border: 0;
   color: inherit;
   text-align: left;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 
-.members-person-trigger:disabled {
+.members-dir-trigger:disabled {
   cursor: default;
 }
 
-.members-person-trigger:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--color-white) 6%, transparent);
+.members-dir-trigger:not(:disabled):hover {
+  opacity: 0.75;
 }
 
-.members-person-trigger:focus-visible {
+.members-dir-trigger:focus-visible {
   outline: 2px solid var(--color-text);
-  outline-offset: -2px;
+  outline-offset: 2px;
 }
 
-.members-person-trigger[aria-expanded="true"] {
-  background: color-mix(in srgb, var(--color-white) 8%, transparent);
-}
-
-.members-person-text {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.members-person-name {
-  font: 700 17px / 1.25 NeueHaasDisplay, sans-serif;
+.members-dir-name {
+  font: 500 16px / 1.3 NeueHaasDisplay, sans-serif;
   color: var(--color-white);
 }
 
-.members-person-role {
+.members-dir-meta {
   font-family: FeatureMono, monospace;
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  opacity: 0.6;
+  opacity: 0.45;
+  margin-left: auto;
 }
 
-.members-person-more {
+.members-dir-chevron {
   font-size: 12px;
-  opacity: 0.5;
+  opacity: 0.4;
+  margin-left: 12px;
+  flex-shrink: 0;
 }
 
-/* Lead / Co-lead are visually larger */
-.members-lead-card {
-  border-width: 1.5px;
-  border-color: color-mix(in srgb, var(--color-text) 22%, transparent);
-  background: color-mix(in srgb, var(--color-white) 4%, transparent);
-}
-
-.members-lead-card .members-person-trigger {
-  padding: 20px 24px;
-}
-
-.members-lead-card .members-person-name {
-  font: 800 clamp(20px, 2.5vw, 24px) / 1.15 NeueHaasDisplay, sans-serif;
-  letter-spacing: -0.01em;
-}
-
-.members-lead-card .members-person-role {
-  font-size: 12px;
-  letter-spacing: 0.16em;
-  color: var(--color-white);
-  opacity: 0.8;
-}
-
-/* ---------- Person details (expanded) ---------- */
-
-.members-details {
-  border-top: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent);
-  padding: 16px 20px 20px 20px;
-  background: color-mix(in srgb, var(--color-bg) 60%, transparent);
-  display: flex;
+/* Disclosure details (shared) */
+.members-expanded {
+  display: none;
   flex-direction: column;
   gap: 12px;
-}
-
-.members-lead-card .members-details {
-  padding: 18px 24px 24px 24px;
-}
-
-.members-details:not(.is-open) {
-  display: none;
+  padding: 12px 0 20px 0;
+  overflow: hidden;
 }
 
 .members-detail-row {
   display: flex;
-  gap: 12px;
+  gap: 16px;
   align-items: flex-start;
   font-size: 14px;
   line-height: 1.5;
 }
 
 .members-detail-row .label {
-  flex: 0 0 auto;
-  width: 96px;
+  flex: 0 0 96px;
   font-family: FeatureMono, monospace;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  opacity: 0.55;
+  opacity: 0.45;
   color: var(--color-text);
 }
 
 .members-detail-row .value {
-  color: var(--color-white);
-  opacity: 0.85;
+  color: rgba(255, 255, 255, 0.85);
+  flex: 1;
 }
 
 .members-detail-row .value.bio {
-  font-size: 14.5px;
+  font-size: 14px;
+  line-height: 1.6;
   white-space: pre-wrap;
 }
 
 .members-detail-links {
   display: flex;
-  gap: 12px;
+  gap: 10px;
+  flex-wrap: wrap;
   margin-top: 4px;
 }
 
 .members-detail-links a {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
+  gap: 6px;
+  font-size: 12px;
   color: var(--color-text);
   text-decoration: none;
-  border: 1px solid color-mix(in srgb, var(--color-text) 20%, transparent);
-  border-radius: 6px;
-  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  padding: 5px 10px;
   transition: all 0.2s ease;
+  font-family: FeatureMono, monospace;
+  letter-spacing: 0.08em;
 }
 
-.members-detail-links a:focus-visible,
-.members-detail-links a:hover {
-  border-color: var(--color-white);
+.members-detail-links a:hover,
+.members-detail-links a:focus-visible {
   color: var(--color-white);
-  outline: 2px solid var(--color-text);
-  outline-offset: 2px;
+  border-color: rgba(255, 255, 255, 0.45);
+  outline: none;
+}
+
+.members-empty {
+  font-family: FeatureMono, monospace;
+  font-size: 13px;
+  opacity: 0.5;
+  letter-spacing: 0.1em;
+}
+
+/* Progress dots */
+.members-progress {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  z-index: 5;
+}
+
+.members-progress-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.members-progress-dot.is-active {
+  background: var(--color-white);
+  transform: scaleX(2.5);
+  border-radius: 3px;
 }
 
 /* ==========================================================================
@@ -513,38 +575,7 @@
     min-height: 600px;
     display: flex;
     flex-direction: column;
-    padding-top: clamp(60px, 8vh, 90px);
-    padding-bottom: 24px;
     overflow: hidden;
-  }
-
-  .members-rail-wrap {
-    flex: 0 0 auto;
-  }
-
-  .members-rail-container {
-    overflow: hidden;
-  }
-
-  .members-panel {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-    overscroll-behavior: contain;
-    padding: 24px var(--spacing) 40px var(--spacing);
-    margin-top: 20px;
-    scrollbar-width: thin;
-    scrollbar-color: color-mix(in srgb, var(--color-text) 25%, transparent) transparent;
-  }
-
-  .members-panel::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .members-panel::-webkit-scrollbar-thumb {
-    background: color-mix(in srgb, var(--color-text) 20%, transparent);
-    border-radius: 3px;
   }
 }
 
@@ -593,72 +624,69 @@
   /* Team Stage: Unpinned, native horizontal rail */
   .members-stage {
     height: auto;
-    display: block;
+    display: flex;
+    flex-direction: column;
     overflow: visible;
-    padding: 32px 0 40px 0;
   }
 
-  .members-rail-wrap {
-    padding: 0 20px;
+  .members-stage-header {
+    position: relative;
+    top: auto;
+    right: auto;
+    padding: 24px 20px 0 20px;
+    justify-content: flex-end;
   }
 
-  .members-rail-container {
+  .members-rail-outer {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
+    padding: 24px 0 20px 0;
   }
 
   .members-rail-track {
     transform: none !important;
-    width: auto;
   }
 
   .members-tablist {
-    gap: 20px;
+    padding: 0 20px;
+    gap: 24px;
   }
 
   .members-tab {
-    font-size: clamp(24px, 8vw, 36px);
-    padding-bottom: 8px;
+    font-size: clamp(28px, 8vw, 44px);
+    opacity: 1 !important;
+    transform: none !important;
   }
 
   .members-panel {
+    min-height: auto;
+    overflow: visible;
+  }
+
+  .members-panel-scroll {
     height: auto;
     overflow: visible;
-    margin-top: 36px;
-    padding: 0 20px 32px 20px;
+    mask-image: none;
   }
 
-  .members-team-name {
-    font-size: clamp(26px, 8vw, 38px);
+  .members-panel-inner {
+    padding: 28px 20px 56px 20px;
   }
 
-  .members-lead-row,
-  .members-people {
+  .members-leaders {
     grid-template-columns: 1fr;
-    gap: 14px;
+    gap: 28px;
+    padding-bottom: 28px;
+    margin-bottom: 28px;
   }
 
-  .members-person-trigger {
-    padding: 14px 16px;
+  .members-leader-name {
+    font-size: clamp(24px, 7vw, 36px);
   }
 
-  .members-person-name {
-    font-size: 15px;
-  }
-
-  .members-lead-card .members-person-name {
-    font-size: 18px;
-  }
-
-  .members-details,
-  .members-lead-card .members-details {
-    padding: 14px 16px 16px 16px;
-  }
-
-  .members-detail-row .label {
-    width: 76px;
-    font-size: 10px;
+  .members-progress {
+    display: none;
   }
 }
 
@@ -668,10 +696,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .members-tab,
-  .members-person,
-  .members-person-trigger,
-  .members-nav button,
-  .members-detail-links a,
+  .members-stage-nav-btn,
+  .members-progress-dot,
+  .members-leader-trigger,
+  .members-dir-trigger,
   .members-board-link,
   .members-board-photo-wrap img {
     transition: none !important;
@@ -685,15 +713,25 @@
   }
 
   .members-panel {
-    height: auto !important;
     overflow: visible !important;
+    min-height: auto !important;
   }
 
-  .members-rail-container {
+  .members-panel-scroll {
+    overflow: visible !important;
+    mask-image: none !important;
+  }
+
+  .members-rail-outer {
     overflow-x: auto !important;
   }
 
   .members-rail-track {
     transform: none !important;
+  }
+
+  .members-panel-inner {
+    clip-path: none !important;
+    opacity: 1 !important;
   }
 }

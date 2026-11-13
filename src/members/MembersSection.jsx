@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import SplitType from "split-type";
 import { teams, board } from "./index.js";
 import { memberCopy } from "./memberCopy.js";
 import "./members.css";
 
 const MISSING = memberCopy.toBeAnnounced;
+
+/* ─── Helpers ────────────────────────────────────────────────────────────── */
 
 const initials = (name) => {
   const parts = (name || "")
@@ -17,11 +20,15 @@ const initials = (name) => {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 };
 
+const pad2 = (n) => String(n).padStart(2, "0");
+
+/* ─── SVG Icons ──────────────────────────────────────────────────────────── */
+
 const ExternalIcon = () => (
   <svg
     viewBox="0 0 24 24"
-    width="14"
-    height="14"
+    width="12"
+    height="12"
     fill="none"
     stroke="currentColor"
     strokeWidth="1.5"
@@ -47,6 +54,8 @@ const GitHubIcon = () => (
   </svg>
 );
 
+/* ─── Component ──────────────────────────────────────────────────────────── */
+
 export default function MembersSection() {
   const [reduced, setReduced] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -55,23 +64,35 @@ export default function MembersSection() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [openId, setOpenId] = useState(null);
 
+  /* scroll / pin state */
   const activeIndexRef = useRef(0);
   const isPinnedRef = useRef(false);
   const triggerRef = useRef(null);
 
+  /* DOM refs */
   const stageRef = useRef(null);
   const railContainerRef = useRef(null);
   const trackRef = useRef(null);
   const tablistRef = useRef(null);
   const tabRefs = useRef([]);
   const panelRef = useRef(null);
+  const panelInnerRef = useRef(null);
   const detailRefs = useRef({});
   const prevOpenRef = useRef(null);
+
+  /* leader name refs for SplitType reveal */
+  const leadNameRef = useRef(null);
+  const coLeadNameRef = useRef(null);
+  const splitInstances = useRef([]);
+
+  /* updateTabVisuals is set every render so GSAP onUpdate can call it without stale closure */
+  const updateTabVisualsRef = useRef(null);
 
   const teamCount = teams.length;
   const lastIndex = Math.max(0, teamCount - 1);
   const team = teams[activeIndex] || null;
 
+  /* ── reduced-motion listener ─────────────────────────────────────────── */
   useEffect(() => {
     const media = matchMedia("(prefers-reduced-motion: reduce)");
     const change = () => setReduced(media.matches);
@@ -79,6 +100,7 @@ export default function MembersSection() {
     return () => media.removeEventListener("change", change);
   }, []);
 
+  /* ── Escape closes disclosure ────────────────────────────────────────── */
   useEffect(() => {
     if (!openId) return;
     const onKey = (e) => {
@@ -88,7 +110,7 @@ export default function MembersSection() {
     return () => document.removeEventListener("keydown", onKey);
   }, [openId]);
 
-  // Disclosure animation
+  /* ── Disclosure animation ────────────────────────────────────────────── */
   useEffect(() => {
     const prev = prevOpenRef.current;
     if (prev && prev !== openId) {
@@ -123,81 +145,83 @@ export default function MembersSection() {
     prevOpenRef.current = openId;
   }, [openId, reduced]);
 
-  // Panel subtle reveal on team switch
+  /* ── Tab scale/opacity gradient ────────────────────────────────────────── */
+  const updateTabVisuals = (progress) => {
+    tabRefs.current.forEach((tab, i) => {
+      if (!tab) return;
+      const dist = Math.abs(i - progress * Math.max(1, lastIndex));
+      const t = Math.min(dist, 2.5) / 2.5;
+      /* active: scale 1, opacity 1 — far: scale 0.58, opacity 0.22 */
+      gsap.set(tab, {
+        scale: 1 - 0.42 * t,
+        opacity: 1 - 0.78 * t,
+      });
+    });
+  };
+
+  useEffect(() => {
+    updateTabVisualsRef.current = updateTabVisuals;
+  });
+
+  /* ── Panel dropdown reveal + SplitType lead-name animation ──────────── */
   useEffect(() => {
     activeIndexRef.current = activeIndex;
-    if (reduced || !panelRef.current) return;
-    gsap.fromTo(
-      panelRef.current,
-      { opacity: 0.3, y: 10 },
-      { opacity: 1, y: 0, duration: 0.3, ease: "power2.out", overwrite: "auto" },
-    );
-  }, [activeIndex, reduced]);
 
-  // Select team & sync with scroll
-  const selectTeam = (index, userInitiated = true) => {
-    if (index < 0 || index >= teamCount) return;
-    setOpenId(null);
-    setActiveIndex(index);
-    activeIndexRef.current = index;
+    /* cleanup previous SplitType instances */
+    splitInstances.current.forEach((s) => s?.revert());
+    splitInstances.current = [];
 
-    if (userInitiated) {
-      if (isPinnedRef.current && triggerRef.current && lastIndex > 0) {
-        const trigger = triggerRef.current;
-        const progress = index / lastIndex;
-        const targetY = trigger.start + progress * (trigger.end - trigger.start);
-        window.scrollTo({
-          top: targetY,
-          behavior: reduced ? "auto" : "smooth",
-        });
-      } else {
-        const tabEl = tabRefs.current[index];
-        if (tabEl) {
-          tabEl.scrollIntoView({
-            block: "nearest",
-            inline: "center",
-            behavior: reduced ? "auto" : "smooth",
-          });
-        }
+    if (!reduced) {
+      /* 1. Clip-path dropdown wipe on panel inner */
+      if (panelInnerRef.current) {
+        gsap.fromTo(
+          panelInnerRef.current,
+          { clipPath: "inset(0 0 100% 0 round 0px)", opacity: 0 },
+          {
+            clipPath: "inset(0 0 0% 0 round 0px)",
+            opacity: 1,
+            duration: 0.55,
+            ease: "power3.out",
+            overwrite: "auto",
+          },
+        );
       }
+
+      /* 2. SplitType line-mask reveal for lead + co-lead names */
+      [leadNameRef.current, coLeadNameRef.current]
+        .filter(Boolean)
+        .forEach((el, i) => {
+          const split = new SplitType(el, { types: "chars" });
+          splitInstances.current.push(split);
+          gsap.fromTo(
+            split.chars,
+            { yPercent: 110 },
+            {
+              yPercent: 0,
+              stagger: 0.022,
+              duration: 0.65,
+              delay: 0.1 + i * 0.08,
+              ease: "power4.out",
+              overwrite: "auto",
+            },
+          );
+        });
     }
 
-    const currentTab = tabRefs.current[index];
-    if (currentTab) {
-      currentTab.focus({ preventScroll: true });
+    /* Tab visuals (always, even with reduced motion — no transitions in CSS) */
+    if (lastIndex > 0) {
+      updateTabVisualsRef.current?.(activeIndex / lastIndex);
+    } else {
+      updateTabVisualsRef.current?.(0);
     }
-  };
 
-  const move = (delta) => selectTeam(activeIndex + delta, true);
+    return () => {
+      splitInstances.current.forEach((s) => s?.revert());
+      splitInstances.current = [];
+    };
+  }, [activeIndex, reduced, lastIndex]);
 
-  const onTabListKeyDown = (e) => {
-    if (e.target.closest("[role=tab]") === null) return;
-    switch (e.key) {
-      case "ArrowRight":
-        e.preventDefault();
-        move(1);
-        break;
-      case "ArrowLeft":
-        e.preventDefault();
-        move(-1);
-        break;
-      case "Home":
-        e.preventDefault();
-        selectTeam(0, true);
-        break;
-      case "End":
-        e.preventDefault();
-        selectTeam(lastIndex, true);
-        break;
-      default:
-    }
-  };
-
-  const togglePerson = (id) => {
-    setOpenId((prev) => (prev === id ? null : id));
-  };
-
-  // GSAP ScrollTrigger Pinned Horizontal Scroll
+  /* ── GSAP ScrollTrigger pinned horizontal scroll ─────────────────────── */
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -252,6 +276,9 @@ export default function MembersSection() {
       const initialProgress = lastIndex > 0 ? activeIndexRef.current / lastIndex : 0;
       gsap.set(track, { x: startX + initialProgress * (endX - startX) });
 
+      /* also apply initial tab visuals */
+      updateTabVisualsRef.current?.(initialProgress);
+
       const scrollDistance = (teamCount - 1) * Math.max(500, Math.round(window.innerHeight * 0.75));
 
       st = ST.create({
@@ -271,6 +298,9 @@ export default function MembersSection() {
           const curX = sX + self.progress * (eX - sX);
           gsap.set(track, { x: curX });
 
+          /* per-tab scale/opacity gradient */
+          updateTabVisualsRef.current?.(self.progress);
+
           const idx = Math.min(lastIndex, Math.max(0, Math.round(self.progress * lastIndex)));
           if (idx !== activeIndexRef.current) {
             activeIndexRef.current = idx;
@@ -282,6 +312,7 @@ export default function MembersSection() {
           if (st) {
             const curX = sX + st.progress * (eX - sX);
             gsap.set(track, { x: curX });
+            updateTabVisualsRef.current?.(st.progress);
           }
         },
       });
@@ -296,10 +327,7 @@ export default function MembersSection() {
 
     const timer = setTimeout(setupScrollTrigger, 120);
 
-    const onResize = () => {
-      setupScrollTrigger();
-    };
-
+    const onResize = () => setupScrollTrigger();
     window.addEventListener("resize", onResize);
     window.addEventListener("orientationchange", onResize);
 
@@ -320,7 +348,62 @@ export default function MembersSection() {
     };
   }, [teamCount, lastIndex, reduced]);
 
-  // Render Board Member (Change 2)
+  /* ── Controls ─────────────────────────────────────────────────────────── */
+
+  const selectTeam = (index, userInitiated = true) => {
+    if (index < 0 || index >= teamCount) return;
+    setOpenId(null);
+    setActiveIndex(index);
+    activeIndexRef.current = index;
+
+    if (userInitiated) {
+      if (isPinnedRef.current && triggerRef.current && lastIndex > 0) {
+        const trigger = triggerRef.current;
+        const progress = index / lastIndex;
+        const targetY = trigger.start + progress * (trigger.end - trigger.start);
+        window.scrollTo({ top: targetY, behavior: reduced ? "auto" : "smooth" });
+      } else {
+        const tabEl = tabRefs.current[index];
+        if (tabEl) {
+          tabEl.scrollIntoView({ block: "nearest", inline: "center", behavior: reduced ? "auto" : "smooth" });
+        }
+      }
+    }
+
+    const currentTab = tabRefs.current[index];
+    if (currentTab) currentTab.focus({ preventScroll: true });
+  };
+
+  const move = (delta) => selectTeam(activeIndex + delta, true);
+
+  const onTabListKeyDown = (e) => {
+    if (e.target.closest("[role=tab]") === null) return;
+    switch (e.key) {
+      case "ArrowRight":
+        e.preventDefault();
+        move(1);
+        break;
+      case "ArrowLeft":
+        e.preventDefault();
+        move(-1);
+        break;
+      case "Home":
+        e.preventDefault();
+        selectTeam(0, true);
+        break;
+      case "End":
+        e.preventDefault();
+        selectTeam(lastIndex, true);
+        break;
+      default:
+    }
+  };
+
+  const togglePerson = (id) => setOpenId((prev) => (prev === id ? null : id));
+
+  /* ── Render helpers ───────────────────────────────────────────────────── */
+
+  /* Board member card (Change 2: photos, no dropdown) */
   const renderBoardMember = (member) => {
     const photoUrl = member.photoSrc;
     const name = member.name || MISSING;
@@ -381,26 +464,112 @@ export default function MembersSection() {
     );
   };
 
-  // Render Team Person (Change 3: NO photos for team people)
-  const renderPerson = (person, isLead = false) => {
+  /* Detail rows shared between leader and directory items */
+  const renderPersonDetails = (person) => {
+    const name = person.name || MISSING;
+    const by = memberCopy.branchYear(person.branch, person.year);
+    return (
+      <div
+        ref={(el) => {
+          detailRefs.current[person.id] = el;
+        }}
+        id={`members-details-${person.id}`}
+        className="members-expanded"
+        role="region"
+        aria-labelledby={`members-trigger-${person.id}`}
+      >
+        {by && (
+          <div className="members-detail-row">
+            <span className="label">Branch · Year</span>
+            <span className="value">{by}</span>
+          </div>
+        )}
+        {person.bio && (
+          <div className="members-detail-row">
+            <span className="label">About</span>
+            <span className="value bio">{person.bio}</span>
+          </div>
+        )}
+        {(person.linkedin || person.github) && (
+          <div className="members-detail-links">
+            {person.linkedin && (
+              <a href={person.linkedin} target="_blank" rel="noopener noreferrer" aria-label={memberCopy.linkedin(name)}>
+                LinkedIn <ExternalIcon />
+              </a>
+            )}
+            {person.github && (
+              <a href={person.github} target="_blank" rel="noopener noreferrer" aria-label={memberCopy.github(name)}>
+                GitHub <ExternalIcon />
+              </a>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  /* Leader block: large name with SplitType reveal, expandable details */
+  const renderLeader = (person, roleLabel, isLead) => {
     if (!person) return null;
     const isOpen = openId === person.id;
     const name = person.name || MISSING;
-    const role = person.role || "";
     const by = memberCopy.branchYear(person.branch, person.year);
     const hasDetails = Boolean(by || person.bio || person.linkedin || person.github);
 
     return (
-      <div
-        key={person.id}
-        className={`members-person ${isLead ? "members-lead-card" : ""}`}
-      >
+      <div className="members-leader" key={person.id}>
+        <span className="members-leader-label">{roleLabel}</span>
+        {hasDetails ? (
+          <button
+            type="button"
+            id={`members-trigger-${person.id}`}
+            className="members-leader-trigger"
+            aria-expanded={isOpen}
+            aria-controls={`members-details-${person.id}`}
+            onClick={() => togglePerson(person.id)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setOpenId(null);
+            }}
+          >
+            <span
+              className="members-leader-name"
+              ref={isLead ? leadNameRef : coLeadNameRef}
+            >
+              {name}
+            </span>
+            <span className="members-leader-chevron" aria-hidden="true">
+              {isOpen ? "↑" : "↓"}
+            </span>
+          </button>
+        ) : (
+          <span
+            className="members-leader-name"
+            ref={isLead ? leadNameRef : coLeadNameRef}
+          >
+            {name}
+          </span>
+        )}
+        {hasDetails && renderPersonDetails(person)}
+      </div>
+    );
+  };
+
+  /* Directory item: flat list row with right-side meta, expandable */
+  const renderDirItem = (person) => {
+    if (!person) return null;
+    const isOpen = openId === person.id;
+    const name = person.name || MISSING;
+    const by = memberCopy.branchYear(person.branch, person.year);
+    const hasDetails = Boolean(by || person.bio || person.linkedin || person.github);
+
+    return (
+      <div className="members-dir-item" key={person.id}>
         <button
           type="button"
-          className="members-person-trigger"
-          aria-expanded={isOpen}
-          aria-controls={`members-details-${person.id}`}
           id={`members-trigger-${person.id}`}
+          className="members-dir-trigger"
+          aria-expanded={hasDetails ? isOpen : undefined}
+          aria-controls={hasDetails ? `members-details-${person.id}` : undefined}
           disabled={!hasDetails}
           onClick={() => {
             if (!hasDetails) return;
@@ -410,79 +579,20 @@ export default function MembersSection() {
             if (e.key === "Escape") setOpenId(null);
           }}
         >
-          <div className="members-person-text">
-            <div className="members-person-name">{name}</div>
-            <div className="members-person-role">{role}</div>
-          </div>
+          <span className="members-dir-name">{name}</span>
+          {by && <span className="members-dir-meta">{by}</span>}
           {hasDetails && (
-            <span className="members-person-more" aria-hidden="true">
-              {isOpen ? "▲" : "▼"}
+            <span className="members-dir-chevron" aria-hidden="true">
+              {isOpen ? "↑" : "↓"}
             </span>
           )}
         </button>
-
-        {hasDetails && (
-          <div
-            ref={(el) => {
-              detailRefs.current[person.id] = el;
-            }}
-            id={`members-details-${person.id}`}
-            className={`members-details ${isOpen ? "is-open" : ""}`}
-          >
-            {by && (
-              <div className="members-detail-row">
-                <span className="label">Branch · Year</span>
-                <span className="value">{by}</span>
-              </div>
-            )}
-            {person.bio && (
-              <div className="members-detail-row">
-                <span className="label">About</span>
-                <span className="value bio">{person.bio}</span>
-              </div>
-            )}
-            {(person.linkedin || person.github) && (
-              <div className="members-detail-links">
-                {person.linkedin && (
-                  <a
-                    href={person.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={memberCopy.linkedin(name)}
-                  >
-                    LinkedIn <ExternalIcon />
-                  </a>
-                )}
-                {person.github && (
-                  <a
-                    href={person.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={memberCopy.github(name)}
-                  >
-                    GitHub <ExternalIcon />
-                  </a>
-                )}
-              </div>
-            )}
-          </div>
-        )}
+        {hasDetails && renderPersonDetails(person)}
       </div>
     );
   };
 
-  const renderGroup = (label, person, isLead) => {
-    if (!person) return null;
-    return (
-      <div className="members-role-group">
-        <span className="members-role-label">{label}</span>
-        <div className={isLead ? "members-lead-row" : "members-people"}>
-          {renderPerson(person, isLead)}
-        </div>
-      </div>
-    );
-  };
-
+  /* ── Empty guard ──────────────────────────────────────────────────────── */
   if (teamCount === 0 && (!board || board.length === 0)) {
     return (
       <section className="members-section">
@@ -491,9 +601,11 @@ export default function MembersSection() {
     );
   }
 
+  /* ── Render ───────────────────────────────────────────────────────────── */
   return (
     <section className="members-section">
-      {/* CHANGE 2: Board section above pinned team stage (normal page flow) */}
+
+      {/* ── Board section (normal page flow) ─────────────────────────── */}
       {board && board.length > 0 && (
         <div className="members-board-section">
           <div className="members-board-header">
@@ -506,96 +618,123 @@ export default function MembersSection() {
         </div>
       )}
 
-      {/* CHANGE 1: Pinned team stage */}
+      {/* ── Pinned team stage ─────────────────────────────────────────── */}
       {teamCount > 0 && (
         <div className="members-stage" ref={stageRef}>
-          <div className="members-rail-wrap">
-            <div className="members-rail-container" ref={railContainerRef}>
-              <div className="members-rail-track" ref={trackRef}>
-                <nav
-                  role="tablist"
-                  aria-label="Teams"
-                  ref={tablistRef}
-                  onKeyDown={onTabListKeyDown}
-                  className="members-tablist"
-                >
-                  {teams.map((t, index) => (
-                    <button
-                      key={t.id}
-                      type="button"
-                      role="tab"
-                      ref={(el) => {
-                        tabRefs.current[index] = el;
-                      }}
-                      id={`members-tab-${t.id}`}
-                      aria-controls={`members-panel-${t.id}`}
-                      aria-selected={index === activeIndex}
-                      tabIndex={index === activeIndex ? 0 : -1}
-                      className={`members-tab ${index === activeIndex ? "is-active" : ""}`}
-                      onClick={() => selectTeam(index, true)}
-                    >
-                      {t.name}
-                    </button>
-                  ))}
-                </nav>
-              </div>
-            </div>
 
-            <div className="members-nav">
-              <button
-                type="button"
-                aria-label="Previous team"
-                disabled={activeIndex <= 0}
-                onClick={() => move(-1)}
+          {/* Stage header: counter + nav buttons — absolute top-right */}
+          <div className="members-stage-header" aria-hidden="true">
+            <span className="members-stage-counter">
+              {pad2(activeIndex + 1)} / {pad2(teamCount)}
+            </span>
+            <button
+              type="button"
+              aria-label="Previous team"
+              disabled={activeIndex <= 0}
+              className="members-stage-nav-btn"
+              onClick={() => move(-1)}
+            >
+              ←
+            </button>
+            <button
+              type="button"
+              aria-label="Next team"
+              disabled={activeIndex >= lastIndex}
+              className="members-stage-nav-btn"
+              onClick={() => move(1)}
+            >
+              →
+            </button>
+          </div>
+
+          {/* Rail — overflow:hidden container, GSAP-translated track */}
+          <div className="members-rail-outer" ref={railContainerRef}>
+            <div className="members-rail-track" ref={trackRef}>
+              <nav
+                role="tablist"
+                aria-label="Teams"
+                ref={tablistRef}
+                onKeyDown={onTabListKeyDown}
+                className="members-tablist"
               >
-                ←
-              </button>
-              <span className="members-nav-count" aria-hidden="true">
-                {activeIndex + 1} of {teamCount}
-              </span>
-              <button
-                type="button"
-                aria-label="Next team"
-                disabled={activeIndex >= lastIndex}
-                onClick={() => move(1)}
-              >
-                →
-              </button>
+                {teams.map((t, index) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    role="tab"
+                    ref={(el) => { tabRefs.current[index] = el; }}
+                    id={`members-tab-${t.id}`}
+                    aria-controls={`members-panel-${t.id}`}
+                    aria-selected={index === activeIndex}
+                    tabIndex={index === activeIndex ? 0 : -1}
+                    className="members-tab"
+                    onClick={() => selectTeam(index, true)}
+                  >
+                    {t.name}
+                  </button>
+                ))}
+              </nav>
             </div>
           </div>
 
+          {/* Thin rule between rail and panel */}
+          <div className="members-panel-divider" aria-hidden="true" />
+
+          {/* Panel — the dropdown reveal area */}
           <div
             className="members-panel"
             ref={panelRef}
             role="tabpanel"
-            id={`members-panel-${team.id}`}
-            aria-labelledby={`members-tab-${team.id}`}
+            id={`members-panel-${team?.id}`}
+            aria-labelledby={`members-tab-${team?.id}`}
           >
-            {team ? (
-              <>
-                <h2 className="members-team-name">{team.name}</h2>
-                {team.tagline && <p className="members-tagline">{team.tagline}</p>}
-                <p className="members-count">
-                  {team.memberCount} member{team.memberCount !== 1 ? "s" : ""}
-                </p>
-                <hr className="members-divider" />
-                {renderGroup(memberCopy.lead, team.lead, true)}
-                {renderGroup(memberCopy.coLead, team.coLead, false)}
-                {team.members && team.members.length > 0 && (
-                  <div className="members-role-group">
-                    <span className="members-role-label">{memberCopy.members}</span>
-                    <div className="members-people">
-                      {team.members.map((person) => renderPerson(person, false))}
-                    </div>
-                  </div>
+            <div className="members-panel-scroll">
+              <div className="members-panel-inner" ref={panelInnerRef}>
+                {team ? (
+                  <>
+                    {/* Leaders side-by-side */}
+                    {(team.lead || team.coLead) && (
+                      <div className="members-leaders">
+                        {renderLeader(team.lead, memberCopy.lead, true)}
+                        {renderLeader(team.coLead, memberCopy.coLead, false)}
+                      </div>
+                    )}
+
+                    {/* Member directory */}
+                    {team.members && team.members.length > 0 && (
+                      <div className="members-directory">
+                        <div className="members-dir-header">
+                          {memberCopy.members} · {team.members.length}
+                        </div>
+                        <div className="members-dir-list">
+                          {team.members.map((p) => renderDirItem(p))}
+                        </div>
+                      </div>
+                    )}
+
+                    {!team.lead && !team.coLead && (!team.members || !team.members.length) && (
+                      <p className="members-empty">{memberCopy.noMembers}</p>
+                    )}
+                  </>
+                ) : (
+                  <p className="members-empty">{memberCopy.noMembers}</p>
                 )}
-                {!team.lead && !team.coLead && (!team.members || team.members.length === 0) && (
-                  <p>{memberCopy.noMembers}</p>
-                )}
-              </>
-            ) : (
-              <p>{memberCopy.noMembers}</p>
-            )}
+              </div>
+            </div>
+          </div>
+
+          {/* Progress dots */}
+          <div className="members-progress" aria-hidden="true">
+            {teams.map((t, i) => (
+              <button
+                key={t.id}
+                type="button"
+                className={`members-progress-dot${i === activeIndex ? " is-active" : ""}`}
+                onClick={() => selectTeam(i, true)}
+                tabIndex={-1}
+                aria-label={`Go to team ${t.name}`}
+              />
+            ))}
           </div>
         </div>
       )}
