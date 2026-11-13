@@ -1,80 +1,108 @@
 # Members section verification
 
-Branch: `feat/members-section`. This pass replaces the placeholder members
-gallery on the home page (`data-layout="04"`) with a scrollable team rail and an
-expandable team panel, authored like the events section.
+Branch: `feat/members-section`. This pass completes the Members section on the
+home page (`data-layout="04"`), introducing an executive Board showcase, a
+pinned scroll-driven horizontal track for team names, and typography-first team
+person cards.
 
 ## Changes
 
-### Data / validation
-- `src/members/members.js` — ordered `teams` list with a fully commented copyable
-  TEMPLATE. Five placeholder teams (Technical, Web Development, Design, PR, Event
-  Management) with `(TBA)` people; no invented real names, bios or URLs.
-- `src/members/memberCopy.js` — UI copy (Lead / Co-lead / Members / To be
-  announced / link accessible names).
-- `src/members/memberModel.js` — `validateMembers` and `prepareMembers` plus
-  `PHOTO_SPEC`. Validation names the team id, person id and field: unique team
-  and person ids, required fields, https linkedin/github on the expected hosts,
-  photo file exists and is roughly square, no cross-team duplicate people unless
-  `shared: true`.
-- `src/members/index.js` — filename-only `import.meta.glob` photo resolver
-  keyed by basename; prepares teams (previews hidden in production unless no real
-  team exists).
-- `scripts/check-members.mjs` — validation entry; errors to stderr, exit code 1
-  on failure.
+### Change 1: Pinned horizontal scroll for team names
+- `src/members/MembersSection.jsx` — Desktop (≥768px, no reduced-motion) uses
+  GSAP ScrollTrigger to pin `.members-stage` when reaching the top of the
+  viewport (`start: "top top"`).
+- Vertical scroll slides the team names horizontally across the viewport,
+  centering the active team and revealing its Lead, Co-lead, and members below.
+- Scroll snapping lands cleanly on each team (`snapTo: 1 / (teamCount - 1)`).
+- Scroll distance is tuned per team (`(teamCount - 1) * Math.max(500, Math.round(window.innerHeight * 0.75))`).
+- Full bidirectional synchronization: clicking a team name, the arrow buttons,
+  or using Left/Right/Home/End keys smoothly scrolls the window to the exact
+  pinned progress point.
+- Pinned stage height remains locked at `100svh`. Internal scroll on
+  `.members-panel` (`overflow-y: auto`) accommodates large rosters (e.g. 40
+  members) and expanding disclosures without stage height jitter.
+- Fallback for small screens (<768px) and `prefers-reduced-motion`: unpinned
+  normal page scrolling with a touch-scrollable horizontal swipe rail.
+- Lifecycle cleanup: kills ScrollTrigger instances, disconnects listeners, and
+  calls `ScrollTrigger.refresh()` (both local and global `window.ScrollTrigger`)
+  to ensure sticky layout title/counter (`data-layout="04"`) in `animate.js`
+  re-measures the section height accurately.
 
-### Component / integration
-- `src/members/MembersSection.jsx` — React island: ARIA tablist rail (roving
-  tabindex, arrow/Home/End, wheel/touch/mouse-drag/arrow-button scrolling, active
-  team scrolled into view), selected-team panel with Lead/Co-lead shown larger,
-  per-person disclosure (click + Esc, one open at a time), GSAP subtle panel
-  reveal/disclosure motion gated on `prefers-reduced-motion`, real `<a>` links
-  (`target="_blank" rel="noopener noreferrer"`, https only, accessible names).
-- `src/members/members.css` — `.members-*` styles reusing the site CSS variables;
-  mobile (360px+) stack, ≥44px touch targets, no horizontal page overflow;
-  reduced-motion overrides.
-- `src/members-entry.jsx` — lazy IntersectionObserver mount into `#members-root`
-  (650px rootMargin), mirroring `src/events-entry.jsx`.
-- `index.html` — removed inline members `<style>` block, legacy placeholder
-  markup and the `/js/members-animation.js` script tag; added `#members-root`
-  fallback inside `<section data-layout="04">` (kept `.layout-head` "Members /
-  04" and `style="position:relative"`); added lazy module script tag.
-- `public/js/members-animation.js` — deleted (confirmed unused elsewhere).
+### Change 2: Board members with photos
+- Added an executive Board block above the pinned team stage inside
+  `data-layout="04"` in normal page flow.
+- Photo-first cards: 4:5 portrait frame, name, designation, LinkedIn icon link
+  and optional GitHub icon link.
+- Desktop: single centred row, wrapping to two rows above five people.
+- Mobile (<768px): two-column grid with centered odd items.
+- Board photo spec: 4:5 portrait, ~1000×1250px, WebP <200KB recommended.
+  Resolved by filename from `src/members/photos/board/` (or `photos/`).
+- Missing or failed photos automatically fall back to an initial-letter avatar
+  in the exact 4:5 frame with accessible alt text and `loading="lazy"`.
+- Shared IDs allowed between a board member and team lead with cross-scope
+  consistency checks (name, links).
 
-### Scripts / tests / docs
-- `package.json` — added `check:members`, chained into `prebuild`
-  (`check:events && check:members`), extended `test` glob to include
-  `src/members/*.test.js`.
-- `src/members/memberModel.test.js` — node tests for validation, ordering,
-  fallbacks, URL checks, photo checks.
-- `src/members/photos/sample.png` — valid 800×800 PNG proving the photo pipeline.
-- `src/members/README.md` — non-developer teammate guide.
-- `MEMBERS.md` — this file.
-- `.clinerules` — project rules; added to `.gitignore`.
+### Change 3: No photos for team people
+- Removed all photo fields, photo resolvers, avatar elements, and photo styles
+  from team leads, co-leads, and members.
+- Cards emphasize typographic hierarchy: Lead and Co-lead are visually larger
+  and featured first.
+- Dropdown disclosure shows branch, year, bio, LinkedIn, and GitHub links.
+- Deleted obsolete `src/members/photos/sample.png`.
+- Validator explicitly errors if a team person specifies a `photo` property.
+
+### Data, model, tests, and scripts
+- `src/members/members.js` — exports both `teams` and `board`, with templates
+  for both. All dev preview entries set to `placeholder: true`.
+- `src/members/memberModel.js` — `BOARD_PHOTO_SPEC`, `validateMembers(teams, board, photos)`,
+  `prepareMembers(teams, opts)`, and `prepareBoard(board, opts)`.
+- `src/members/memberCopy.js` — added `board: "Board"`.
+- `src/members/index.js` — imports and exports prepared `teams` and `board`.
+- `scripts/check-members.mjs` — validates both `teams` and `board` against
+  photos from `photos/` and `photos/board/`.
+- `src/members/memberModel.test.js` — 33 tests passing, covering required
+  fields, unique IDs, URL protocols, 4:5 board photo geometry, team photo
+  rejection, cross-scope identity, and placeholder filtering.
+- `src/members/README.md` — teammate instructions for editing board and teams.
 
 ## Tunables
 
-| File | Constant | Meaning |
-| --- | --- | --- |
-| `src/members/memberModel.js` | `PHOTO_SPEC.aspectTolerance` | 0.25 = roughly square allowed deviation |
-| `src/members/memberModel.js` | `PHOTO_SPEC.maxBytes` | 150KB photo warning threshold |
-| `src/members/MembersSection.jsx` | GSAP durations 0.25–0.45s | panel reveal / disclosure motion |
-| `src/members/members.css` | `--spacing`, `clamp()` values | spacing and typographic scale |
-| `src/members-entry.jsx` | `rootMargin: "650px"` | how early the island mounts |
+| File | Constant / Setting | Value | Meaning |
+| --- | --- | --- | --- |
+| `src/members/memberModel.js` | `BOARD_PHOTO_SPEC.width` / `height` | 1000 × 1250 | 4:5 portrait target dimensions |
+| `src/members/memberModel.js` | `BOARD_PHOTO_SPEC.aspectTolerance` | 0.10 | Allowed aspect ratio deviation |
+| `src/members/memberModel.js` | `BOARD_PHOTO_SPEC.maxBytes` | 200KB | Photo warning threshold |
+| `src/members/MembersSection.jsx` | `scrollDistance` | `(teamCount - 1) * Math.max(500, 0.75vh)` | Vertical scroll travel per team |
+| `src/members/MembersSection.jsx` | `snap.duration` | 0.15s – 0.35s | Snapping duration |
+| `src/members/MembersSection.jsx` | `scrub` | 0.4s | Scrub lag for track slide |
+| `src/members/MembersSection.jsx` | panel reveal | 0.3s `power2.out` | Subtle panel switch transition |
+| `src/members/members.css` | `--spacing`, `clamp()` | Responsive scales | Fluid typography & track spacing |
 
 ## Verification actually run
 
-- `npm run lint`: **0 warnings, 0 errors**, exit 0.
-- `npm test`: **31 tests pass** (19 events + 12 members), 0 failures.
-- `npm run check:members`: **passes** against the placeholder data ("Member check passed: 5 entries.").
-- `npm run build`: **passes**; prebuild runs both `check:events` and `check:members`. The members island builds into `dist/assets/MembersSection-*.js`/`.css` and is lazy-loaded from `dist/assets/home-*.js`.
-- `npm run dev`: starts cleanly; home page returns **200** and includes `#members-root` plus the lazy members entry chunk. No startup/runtime errors logged.
+- `npm run lint`: **0 warnings, 0 errors** (oxlint on 66 files).
+- `npm test`: **33 tests pass** (19 events + 14 members), 0 failures.
+- `npm run check:members`: **Passes** ("Member check passed: 5 teams, 5 board entries. Photos and links are ready.").
+- `npm run build`: **Passes**; `prebuild` runs both `check:events` and `check:members`. Clean production bundle produced.
+- Edge cases tested in automated test suite:
+  - Valid teams and board.
+  - Missing team required fields (`id`, `name`, `role`).
+  - Missing board required fields (`id`, `name`, `designation`).
+  - Duplicate team IDs and duplicate board IDs.
+  - Cross-team duplicate person IDs (rejected unless `shared: true`).
+  - Shared identity between board member and team lead with matching vs conflicting details.
+  - Team persons with photo field explicitly rejected.
+  - Invalid LinkedIn and GitHub URLs (non-https, wrong domain).
+  - 4:5 portrait board photos accepted; wide/non-4:5 rejected; missing photos flagged.
+  - PNG header parsing in `imageSize`.
+  - Missing lead falls back to "To be announced".
+  - Production placeholder hiding when real entries exist; retention when all are placeholders.
+  - Board ordering priority and photo resolution.
 
 ## Verification NOT performed
 
-- Browser interaction at 360 / 768 / 1440 px (rail wheel/swipe/drag, ARIA tabbing, disclosure open/close, horizontal overflow, layout title/counter swap) — no browser automation was available in this environment.
-- Real physical devices.
-- Safari and Firefox.
-- Screen readers (VoiceOver/NVDA/JAWS) — ARIA attributes are in place but not verified with assistive technology.
-- Production deployment behind a CDN; photo CORS or image CDN behaviour.
-- The legacy `public/js/main.min.js` / `public/js/animate.js` title-swap behaviour with the new taller interactive section was not exercised in a browser.
+- Browser interaction using Cline's automated browser tool — the tool was not available in this environment.
+- Real physical mobile devices (iOS / Android).
+- Safari and Firefox browser rendering differences.
+- Screen readers (VoiceOver, NVDA, JAWS) — ARIA attributes (`role="tablist"`, `role="tab"`, `role="tabpanel"`, `aria-selected`, `aria-expanded`, roving `tabIndex`) are implemented according to WAI-ARIA standards but not verified with assistive hardware.
+- Real camera / photo CDN upload behavior.

@@ -1,20 +1,34 @@
-# Manage the AI Club teams (Members section)
+# Manage the AI Club teams and board (Members section)
 
-Edit **only `src/members/members.js`**. Put portrait photos in **`src/members/photos/`**.
+Edit **only `src/members/members.js`**. Put board portrait photos in **`src/members/photos/board/`**.
 No other website file needs changing. Start from the latest approved website code.
 
-## 1. Edit the team details
+## 1. Edit the team and board details
 
-Open `src/members/members.js`. Each team is a block beginning with `{` and ending
-with `},` inside the `teams` list. Change the text between the quotation marks
-beside the field you want. Keep the quotation marks, commas and braces.
+Open `src/members/members.js`.
 
-At the top of the file there is a commented **TEMPLATE** block. Copy only the
-block from `{` through `},`. Paste it as another entry inside the `teams` list,
-just before the final `];`, and replace the example text.
+The file contains two lists:
+- `board`: Club executive leadership (shown in photo-first cards above the team stage).
+- `teams`: Club technical and operational teams (shown in the pinned horizontal track).
 
-Every team needs a unique `id` (for example `technical`) and a real public
-`name`. All other fields are optional:
+### Board member fields
+At the top of `src/members/members.js` there is a commented **BOARD TEMPLATE** block.
+
+| Field | What to enter |
+| --- | --- |
+| `id` | Unique lowercase short name, e.g. `president`. Never reuse an id. |
+| `name` | Person's name shown on the card. Use `(TBA)` until confirmed. |
+| `designation` | Role shown under the name, e.g. `Club President`. |
+| `photo` | Optional picture filename in `src/members/photos/board/`, e.g. `president.webp`. |
+| `linkedin` | Optional, must start with `https://linkedin.com/`. |
+| `github` | Optional, must start with `https://github.com/`. |
+| `order` | Optional integer sorting priority (1, 2, ...). |
+| `placeholder` | `true` = development preview; `false` = real entry. |
+
+A board member who also leads a team can share the same `id`.
+
+### Team fields
+Each team is a block beginning with `{` and ending with `},` inside the `teams` list:
 
 | Field | What to enter |
 | --- | --- |
@@ -26,14 +40,14 @@ Every team needs a unique `id` (for example `technical`) and a real public
 | `members` | A list of `{ id, name, role, ... }` shown below Lead/Co-lead. |
 | `placeholder` | `true` = development preview; `false` = real team. |
 
-### Person fields
+### Team person fields (NO PHOTOS)
+Team leads, co-leads and members do **NOT** have photos. Do NOT add a `photo` field.
 
 | Field | What to enter |
 | --- | --- |
 | `id` | Unique within the club (unless `shared: true`). |
 | `name` | Person's name. Use `(TBA)` placeholders until confirmed. |
 | `role` | Role, e.g. `Member`, `Team Lead`. |
-| `photo` | Only the picture's filename, e.g. `alice.webp`. No paths or imports. |
 | `branch` | Optional, e.g. `CSE`. |
 | `year` | Optional, e.g. `2nd year`. |
 | `bio` | Optional short paragraph. |
@@ -45,17 +59,16 @@ Every team needs a unique `id` (for example `technical`) and a real public
 Do not invent real names, bios or social links. Do not store phone numbers or
 personal email addresses.
 
-## 2. Add a photo
+## 2. Add a board photo
 
-- Recommended: **square 1:1, at least 800×800, WebP under 150KB**. PNG/JPG also OK.
-- Use lowercase letters, numbers and hyphens: `alice.webp`. No spaces or slashes.
-- Upload it to `src/members/photos/` and set `photo: "alice.webp"`. Never write a
-  folder path or website address.
-- Missing or failed pictures fall back to an initials avatar automatically.
+- Board photos are **4:5 portrait (recommended 1000×1250px, WebP under 200KB)**. PNG/JPG also accepted.
+- Use lowercase letters, numbers and hyphens: `president.webp`. No spaces or slashes.
+- Upload it to `src/members/photos/board/` and set `photo: "president.webp"`.
+- Missing or failed pictures fall back to an initial-letter avatar in the 4:5 frame automatically.
 
 ## 3. Check it locally
 
-In the project folder, run `npm install` once, then:
+In the project folder, run:
 
 ```sh
 npm run check:members
@@ -64,36 +77,21 @@ npm run build
 npm run dev
 ```
 
-`check:members` validates ids, required fields, links and photos, and names the
-team id, person id and field for any problem. The build runs it automatically.
+`check:members` validates unique ids, required fields, URLs, and board photos, and flags any unexpected photo field on team members. The build runs it automatically.
 
-Open the address printed by Vite. Look for the Members section, open a team,
-expand a person, and check the details and links. Stop the server with **Ctrl+C**.
-
-## 4. Send it for review
-
-With git: make a new branch, edit `src/members/members.js` (and upload any
-photo), run the checks above, commit, push your branch and open a pull request.
-Do not push to `main`.
-
-Entirely on GitHub: create a branch → open `src/members/members.js` → pencil icon
-→ edit or copy the template → Commit changes. On the same branch open
-`src/members/photos/` → **Add file → Upload files** → upload the image → commit.
-Choose **Compare & pull request**, review both, then **Create pull request**.
-Ask a club lead to review the preview before merging.
-
-## 5. Common problems and their fixes
+## 4. Common problems and their fixes
 
 | What you see | What to do |
 | --- | --- |
-| `id is duplicated` | Give the team/person a different id. |
-| Required field missing | Fill in team `id`/`name`; person `id`/`name`/`role`. |
+| `id is duplicated` | Give the entry/person a different id. |
+| Required field missing | Fill in `id`/`name`; designation (board); role (team). |
+| `photo is not allowed for team members` | Remove the `photo` property from the team lead/member. |
 | LinkedIn/GitHub rejected | Use `https://linkedin.com/...` or `https://github.com/...` only. |
-| Photo not found | Upload it to `src/members/photos/` and match the filename exactly. |
-| Photo wrong shape | Export a square 1:1 image (at least 800×800). |
+| Board photo not found | Upload it to `src/members/photos/board/` and match the filename exactly. |
+| Board photo wrong shape | Export a 4:5 portrait image (~1000×1250px). |
 | Person shown twice across teams | Add `shared: true` if intentional, otherwise give a unique id. |
-| Preview disappears in production | Expected once a real team exists. Use `placeholder: false` for real teams. |
+| Preview disappears in production | Expected once a real entry exists. Use `placeholder: false` for real entries. |
 
-Placeholder behaviour: teams/people marked `placeholder: true` show in
-development. In production they disappear once at least one real team exists;
-if every team is a placeholder they remain so the section is never empty.
+Placeholder behaviour: entries marked `placeholder: true` show in
+development. In production they disappear once at least one real entry exists;
+if every entry is a placeholder they remain so the section is never empty.
