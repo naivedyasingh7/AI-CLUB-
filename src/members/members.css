@@ -16,52 +16,209 @@
   opacity: 0.55;
 }
 
-/* ---------- Team rail ---------- */
+/* ==========================================================================
+   CHANGE 2: Board section (Normal page flow above pinned team stage)
+   ========================================================================== */
+
+.members-board-section {
+  padding: 48px var(--spacing) 64px var(--spacing);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-text) 12%, transparent);
+}
+
+.members-board-header {
+  margin-bottom: 36px;
+  text-align: center;
+}
+
+.members-board-title {
+  margin: 0;
+  font: 900 clamp(28px, 4.5vw, 44px) / 1.1 NeueHaasDisplay, sans-serif;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--color-white);
+}
+
+.members-board-subtitle {
+  margin: 8px 0 0 0;
+  font-family: FeatureMono, monospace;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  color: var(--color-text);
+}
+
+/* Desktop: centered row, wraps to two rows above 5 */
+.members-board-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: clamp(20px, 3vw, 36px);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.members-board-card {
+  flex: 0 1 180px;
+  width: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.members-board-photo-wrap {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #111;
+  position: relative;
+  border: 1px solid color-mix(in srgb, var(--color-text) 14%, transparent);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.members-board-photo-wrap img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  z-index: 2;
+  transition: transform 0.4s ease;
+}
+
+.members-board-card:hover .members-board-photo-wrap img {
+  transform: scale(1.05);
+}
+
+.members-board-avatar {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background: linear-gradient(145deg, #181818, #282828);
+  display: grid;
+  place-items: center;
+  font: 900 28px FeatureMono, monospace;
+  color: var(--color-white);
+  letter-spacing: 0.05em;
+}
+
+.members-board-info {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.members-board-name {
+  font: 700 16px / 1.25 NeueHaasDisplay, sans-serif;
+  color: var(--color-white);
+  word-break: break-word;
+}
+
+.members-board-designation {
+  font-family: FeatureMono, monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-text) 70%, transparent);
+  line-height: 1.3;
+}
+
+.members-board-links {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.members-board-link {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-white) 6%, transparent);
+  color: var(--color-text);
+  border: 1px solid color-mix(in srgb, var(--color-text) 15%, transparent);
+  transition: all 0.2s ease;
+}
+
+.members-board-link:hover {
+  color: var(--color-white);
+  background: color-mix(in srgb, var(--color-white) 16%, transparent);
+  border-color: var(--color-white);
+  transform: translateY(-2px);
+}
+
+.members-board-link:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   CHANGE 1: Pinned Horizontal Scroll Team Stage (Desktop >=768px)
+   ========================================================================== */
+
+.members-stage {
+  position: relative;
+  width: 100%;
+  background: var(--color-bg);
+  box-sizing: border-box;
+}
 
 .members-rail-wrap {
   position: relative;
   padding: 0 var(--spacing);
   max-width: 100%;
+  box-sizing: border-box;
 }
 
-.members-rail {
+.members-rail-container {
+  width: 100%;
+  position: relative;
+}
+
+.members-rail-track {
   display: flex;
-  gap: clamp(16px, 4vw, 44px);
-  overflow-x: auto;
-  scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--color-text) 30%, transparent)
-    var(--color-bg);
+  align-items: center;
+  width: max-content;
 }
 
-.members-rail::-webkit-scrollbar {
-  height: 8px;
-  background: var(--color-bg);
-}
-.members-rail::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--color-text) 25%, transparent);
-  border-radius: 4px;
+.members-tablist {
+  display: flex;
+  align-items: center;
+  gap: clamp(20px, 4vw, 48px);
 }
 
 .members-tab {
   flex: none;
-  font: 900 clamp(26px, 5.5vw, 56px) / 1.1 NeueHaasDisplay, sans-serif;
+  font: 900 clamp(28px, 5vw, 56px) / 1.1 NeueHaasDisplay, sans-serif;
   letter-spacing: -0.01em;
   text-transform: uppercase;
-  color: var(--color-text);
+  color: color-mix(in srgb, var(--color-text) 35%, transparent);
   background: transparent;
   border: 0;
-  border-bottom: 2px solid transparent;
-  padding: 0 0 12px 0;
+  border-bottom: 3px solid transparent;
+  padding: 0 4px 12px 4px;
   cursor: pointer;
-  text-wrap: nowrap;
-  transition: border-color 0.2s ease;
+  white-space: nowrap;
+  transition: color 0.2s ease, border-color 0.2s ease;
 }
 
 .members-tab:hover {
-  border-bottom-color: color-mix(in srgb, var(--color-white) 40%, transparent);
+  color: color-mix(in srgb, var(--color-white) 75%, transparent);
 }
 
-.members-tab[aria-selected="true"] {
+.members-tab[aria-selected="true"],
+.members-tab.is-active {
+  color: var(--color-white);
   border-bottom-color: var(--color-white);
 }
 
@@ -70,12 +227,13 @@
   outline-offset: 6px;
   border-radius: 2px;
 }
+
 .members-nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-top: 18px;
-  padding: 0 var(--spacing);
+  padding: 0;
 }
 
 .members-nav button {
@@ -89,32 +247,36 @@
   cursor: pointer;
   display: grid;
   place-items: center;
+  transition: border-color 0.2s ease, color 0.2s ease;
 }
+
 .members-nav button:disabled {
   opacity: 0.25;
   cursor: default;
 }
+
 .members-nav button:focus-visible {
   outline: 2px solid var(--color-text);
   outline-offset: 2px;
 }
+
 .members-nav button:hover:not(:disabled) {
-  border-color: var(--color-text);
+  border-color: var(--color-white);
+  color: var(--color-white);
 }
-.members-nav button[aria-disabled="true"] {
-  pointer-events: none;
+
+.members-nav-count {
+  font-family: FeatureMono, monospace;
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  opacity: 0.6;
 }
 
 /* ---------- Team panel ---------- */
 
-.members-panel {
-  margin-top: 70px;
-  padding: 0 var(--spacing) var(--spacing) var(--spacing);
-}
-
 .members-team-name {
   margin: 0;
-  font: 900 clamp(30px, 6vw, 52px) / 1.08 NeueHaasDisplay, sans-serif;
+  font: 900 clamp(30px, 5.5vw, 52px) / 1.08 NeueHaasDisplay, sans-serif;
   letter-spacing: -0.01em;
   text-transform: uppercase;
   color: var(--color-white);
@@ -137,11 +299,11 @@
 .members-divider {
   border: 0;
   border-top: 1px solid color-mix(in srgb, var(--color-text) 12%, transparent);
-  margin: 40px 0 0 0;
+  margin: 32px 0 0 0;
 }
 
 .members-role-group {
-  margin-top: 42px;
+  margin-top: 36px;
 }
 
 .members-role-label {
@@ -155,144 +317,146 @@
   margin-bottom: 14px;
 }
 
-.members-lead-row,
+.members-lead-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
 .members-people {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
 }
 
-.members-lead-row {
-  display: flex;
-  gap: 30px;
-  align-items: flex-start;
-}
-
-/* ---------- Person card ---------- */
+/* ==========================================================================
+   CHANGE 3: Team Person card (NO photos)
+   ========================================================================== */
 
 .members-person {
   display: flex;
   flex-direction: column;
-  gap: 10px;
   border: 1px solid color-mix(in srgb, var(--color-text) 12%, transparent);
-  border-radius: 14px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--color-white) 2%, transparent);
   overflow: hidden;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.members-person:hover {
+  border-color: color-mix(in srgb, var(--color-text) 24%, transparent);
+  background: color-mix(in srgb, var(--color-white) 4%, transparent);
 }
 
 .members-person-trigger {
   width: 100%;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 16px;
-  padding: 16px;
+  padding: 16px 20px;
   border: 0;
   background: transparent;
   color: inherit;
   text-align: left;
   cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease;
-}
-.members-person-trigger:hover {
-  background: color-mix(in srgb, var(--color-white) 6%, transparent);
-}
-.members-person-trigger:focus-visible {
-  outline: 2px solid var(--color-text);
-  outline-offset: 2px;
-}
-.members-person-trigger[aria-expanded="true"] {
-  background: color-mix(in srgb, var(--color-white) 10%, transparent);
+  transition: background 0.2s ease;
 }
 
-.members-person-photo-wrap {
-  position: relative;
-  width: 56px;
-  height: 56px;
-  flex: 0 0 56px;
-  border-radius: 10px;
-  background: #111;
-  overflow: hidden;
+.members-person-trigger:disabled {
+  cursor: default;
 }
-.members-person-photo-wrap img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+
+.members-person-trigger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-white) 6%, transparent);
 }
-.members-person-avatar {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  display: grid;
-  place-items: center;
-  font: 900 17px FeatureMono, monospace;
-  color: var(--color-white);
+
+.members-person-trigger:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: -2px;
+}
+
+.members-person-trigger[aria-expanded="true"] {
+  background: color-mix(in srgb, var(--color-white) 8%, transparent);
+}
+
+.members-person-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .members-person-name {
   font: 700 17px / 1.25 NeueHaasDisplay, sans-serif;
   color: var(--color-white);
 }
+
 .members-person-role {
-  font-size: 12px;
-  letter-spacing: 0.14em;
+  font-family: FeatureMono, monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   opacity: 0.6;
 }
 
 .members-person-more {
-  margin-left: auto;
-  font-size: 16px;
+  font-size: 12px;
   opacity: 0.5;
 }
 
-/* Lead / Co-lead are shown larger. */
+/* Lead / Co-lead are visually larger */
+.members-lead-card {
+  border-width: 1.5px;
+  border-color: color-mix(in srgb, var(--color-text) 22%, transparent);
+  background: color-mix(in srgb, var(--color-white) 4%, transparent);
+}
+
 .members-lead-card .members-person-trigger {
-  padding: 18px 20px;
-  gap: 22px;
+  padding: 20px 24px;
 }
-.members-lead-card .members-person-photo-wrap {
-  width: 72px;
-  height: 72px;
-  flex: 0 0 72px;
-  border-radius: 12px;
-}
-.members-lead-card .members-person-avatar {
-  font-size: 22px;
-}
+
 .members-lead-card .members-person-name {
-  font-size: 21px;
+  font: 800 clamp(20px, 2.5vw, 24px) / 1.15 NeueHaasDisplay, sans-serif;
+  letter-spacing: -0.01em;
 }
+
 .members-lead-card .members-person-role {
-  font-size: 13px;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  color: var(--color-white);
+  opacity: 0.8;
 }
 
 /* ---------- Person details (expanded) ---------- */
 
 .members-details {
-  display: none;
   border-top: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent);
-  padding: 14px 20px 20px 76px;
-  gap: 10px;
-}
-.members-lead-card .members-details {
-  padding-left: 96px;
+  padding: 16px 20px 20px 20px;
+  background: color-mix(in srgb, var(--color-bg) 60%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.members-details.is-open {
-  display: grid;
+.members-lead-card .members-details {
+  padding: 18px 24px 24px 24px;
+}
+
+.members-details:not(.is-open) {
+  display: none;
 }
 
 .members-detail-row {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   align-items: flex-start;
   font-size: 14px;
   line-height: 1.5;
 }
+
 .members-detail-row .label {
   flex: 0 0 auto;
-  width: 92px;
+  width: 96px;
   font-family: FeatureMono, monospace;
   font-size: 11px;
   font-weight: 700;
@@ -301,10 +465,12 @@
   opacity: 0.55;
   color: var(--color-text);
 }
+
 .members-detail-row .value {
   color: var(--color-white);
   opacity: 0.85;
 }
+
 .members-detail-row .value.bio {
   font-size: 14.5px;
   white-space: pre-wrap;
@@ -312,8 +478,10 @@
 
 .members-detail-links {
   display: flex;
-  gap: 14px;
+  gap: 12px;
+  margin-top: 4px;
 }
+
 .members-detail-links a {
   display: inline-flex;
   align-items: center;
@@ -323,80 +491,209 @@
   text-decoration: none;
   border: 1px solid color-mix(in srgb, var(--color-text) 20%, transparent);
   border-radius: 6px;
-  padding: 6px 10px;
+  padding: 6px 12px;
+  transition: all 0.2s ease;
 }
+
 .members-detail-links a:focus-visible,
 .members-detail-links a:hover {
-  border-color: var(--color-text);
+  border-color: var(--color-white);
+  color: var(--color-white);
   outline: 2px solid var(--color-text);
   outline-offset: 2px;
 }
-.members-detail-links a svg {
-  width: 14px;
-  height: 14px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.6;
+
+/* ==========================================================================
+   Desktop Pinned Stage Rules (>=768px)
+   ========================================================================== */
+
+@media (min-width: 768px) {
+  .members-stage {
+    height: 100svh;
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+    padding-top: clamp(60px, 8vh, 90px);
+    padding-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .members-rail-wrap {
+    flex: 0 0 auto;
+  }
+
+  .members-rail-container {
+    overflow: hidden;
+  }
+
+  .members-panel {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    padding: 24px var(--spacing) 40px var(--spacing);
+    margin-top: 20px;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-text) 25%, transparent) transparent;
+  }
+
+  .members-panel::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .members-panel::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--color-text) 20%, transparent);
+    border-radius: 3px;
+  }
 }
 
-/* ---------- Mobile ---------- */
+/* ==========================================================================
+   Mobile (<768px): Normal page scrolling, native swipe rail
+   ========================================================================== */
 
-@media (max-width: 600px) {
+@media (max-width: 767px) {
+  .members-board-section {
+    padding: 32px 20px 48px 20px;
+  }
+
+  .members-board-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .members-board-grid > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    max-width: 180px;
+    margin: 0 auto;
+  }
+
+  .members-board-card {
+    width: 100%;
+    flex: auto;
+  }
+
+  .members-board-photo-wrap {
+    border-radius: 10px;
+  }
+
+  .members-board-avatar {
+    font-size: 22px;
+  }
+
+  .members-board-name {
+    font-size: 14px;
+  }
+
+  .members-board-designation {
+    font-size: 10px;
+  }
+
+  /* Team Stage: Unpinned, native horizontal rail */
+  .members-stage {
+    height: auto;
+    display: block;
+    overflow: visible;
+    padding: 32px 0 40px 0;
+  }
+
   .members-rail-wrap {
     padding: 0 20px;
   }
+
+  .members-rail-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .members-rail-track {
+    transform: none !important;
+    width: auto;
+  }
+
+  .members-tablist {
+    gap: 20px;
+  }
+
   .members-tab {
-    font-size: clamp(22px, 10vw, 40px);
-    padding-bottom: 10px;
+    font-size: clamp(24px, 8vw, 36px);
+    padding-bottom: 8px;
   }
+
   .members-panel {
-    margin-top: 50px;
-    padding: 0 20px 24px 20px;
+    height: auto;
+    overflow: visible;
+    margin-top: 36px;
+    padding: 0 20px 32px 20px;
   }
+
   .members-team-name {
-    font-size: clamp(26px, 9vw, 40px);
+    font-size: clamp(26px, 8vw, 38px);
   }
-  .members-lead-row {
-    flex-direction: column;
-    gap: 18px;
+
+  .members-lead-row,
+  .members-people {
+    grid-template-columns: 1fr;
+    gap: 14px;
   }
+
   .members-person-trigger {
-    padding: 14px;
-    gap: 12px;
+    padding: 14px 16px;
   }
-  .members-person-photo-wrap {
-    width: 44px;
-    height: 44px;
-    flex: 0 0 44px;
-  }
-  .members-person-avatar {
-    font-size: 14px;
-  }
+
   .members-person-name {
     font-size: 15px;
   }
+
+  .members-lead-card .members-person-name {
+    font-size: 18px;
+  }
+
   .members-details,
   .members-lead-card .members-details {
-    padding: 12px 16px 16px 60px;
+    padding: 14px 16px 16px 16px;
   }
+
   .members-detail-row .label {
-    width: 72px;
+    width: 76px;
     font-size: 10px;
   }
 }
 
-/* ---------- Reduced motion ---------- */
+/* ==========================================================================
+   Reduced Motion
+   ========================================================================== */
 
 @media (prefers-reduced-motion: reduce) {
   .members-tab,
+  .members-person,
   .members-person-trigger,
   .members-nav button,
-  .members-detail-links a {
-    transition: none;
-    animation: none;
+  .members-detail-links a,
+  .members-board-link,
+  .members-board-photo-wrap img {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
   }
-  .members-details {
-    transition: none;
+
+  .members-stage {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .members-panel {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .members-rail-container {
+    overflow-x: auto !important;
+  }
+
+  .members-rail-track {
+    transform: none !important;
   }
 }
-
