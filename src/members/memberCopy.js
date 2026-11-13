@@ -1,4 +1,5 @@
 export const memberCopy = {
+  board: "Board",
   lead: "Lead",
   coLead: "Co-lead",
   members: "Members",

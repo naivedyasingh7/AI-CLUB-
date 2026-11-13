@@ -4,10 +4,12 @@ const MISSING = memberCopy.toBeAnnounced;
 const LINKEDIN_HOST = "linkedin.com";
 const GITHUB_HOST = "github.com";
 
-// Accept roughly square images (within 25% of 1:1).
-export const PHOTO_SPEC = Object.freeze({
-  maxBytes: 150 * 1024,
-  aspectTolerance: 0.25,
+// Team people do NOT have photos. Board photos are 4:5 portrait.
+export const BOARD_PHOTO_SPEC = Object.freeze({
+  width: 1000,
+  height: 1250,
+  maxBytes: 200 * 1024,
+  aspectTolerance: 0.10,
 });
 
 const textOrFallback = (value) =>
@@ -22,39 +24,67 @@ const urlOnHost = (value, host) => {
   }
 };
 
-function checkPhotoDimensions(teamId, role, name, meta, errors, warnings) {
-  const prefix = `${teamId} / ${role}`;
+function checkPhotoDimensions(scope, name, meta, errors, warnings) {
   if (meta.invalid || !meta.width || !meta.height) {
-    errors.push(`${prefix}: "photo" "${name}" could not be read as an image.`);
+    errors.push(`${scope}: "photo" "${name}" could not be read as an image.`);
     return;
   }
   const ratio = meta.width / meta.height;
-  if (Math.abs(ratio - 1) > PHOTO_SPEC.aspectTolerance) {
+  const target = BOARD_PHOTO_SPEC.width / BOARD_PHOTO_SPEC.height;
+  if (Math.abs(ratio - target) > BOARD_PHOTO_SPEC.aspectTolerance) {
     errors.push(
-      `${prefix}: "photo" "${name}" is ${meta.width}×${meta.height}; use a square 1:1 image.`,
+      `${scope}: "photo" "${name}" is ${meta.width}×${meta.height}; use a 4:5 portrait image (~${BOARD_PHOTO_SPEC.width}×${BOARD_PHOTO_SPEC.height}px).`,
     );
   }
-  if (meta.bytes > PHOTO_SPEC.maxBytes) {
+  if (meta.bytes > BOARD_PHOTO_SPEC.maxBytes) {
     warnings.push(
-      `${prefix}: "photo" "${name}" is larger than 150KB. Export a smaller WebP if possible.`,
+      `${scope}: "photo" "${name}" is larger than 200KB. Export a smaller WebP if possible.`,
     );
   }
 }
 
-export function validateMembers(entries, photos = {}) {
+export function validateMembers(teams = [], board = [], photos = {}) {
   const errors = [];
   const warnings = [];
   const teamIds = new Set();
-  const personIds = new Map(); // person id -> team id (unless shared)
+  const boardIds = new Set();
+  const personIds = new Map();
 
-  if (!Array.isArray(entries)) {
-    return {
-      errors: ['members.js: "teams" must be a list of team entries.'],
-      warnings,
-    };
+  if (!Array.isArray(teams)) {
+    return { errors: ['members.js: "teams" must be a list of team entries.'], warnings };
+  }
+  if (!Array.isArray(board)) {
+    return { errors: ['members.js: "board" must be a list of board entries.'], warnings };
   }
 
-  entries.forEach((team, index) => {
+  const registerPerson = (scope, id, person) => {
+    if (!person || typeof person !== "object") return;
+    const personId = person.id;
+    if (typeof personId !== "string" || !personId.trim()) return;
+    const prev = personIds.get(personId);
+    if (prev) {
+      const mismatches = [];
+      if (person.name && prev.name && prev.name !== person.name) mismatches.push("name");
+      if (person.linkedin && prev.linkedin && prev.linkedin !== person.linkedin) mismatches.push("linkedin");
+      if (person.github && prev.github && prev.github !== person.github) mismatches.push("github");
+      if (mismatches.length) {
+        errors.push(
+          `${scope} "${id}" / ${personId}: "id" is shared with ${prev.scope} "${prev.id}" but ${mismatches.join(" and ")} differ. Use one person definition or a different id.`,
+        );
+      }
+    } else {
+      personIds.set(personId, {
+        scope,
+        id,
+        name: person.name,
+        linkedin: person.linkedin,
+        github: person.github,
+      });
+    }
+  };
+
+  // Validate teams
+  teams.forEach((team, index) => {
     const id = team?.id || `team ${index + 1}`;
     const error = (field, message) => errors.push(`${id}: "${field}" ${message}`);
     const personError = (personId, field, message) =>
@@ -88,6 +118,7 @@ export function validateMembers(entries, photos = {}) {
         ? team.members.map((person, i) => ({ role: `member[${i}]`, person }))
         : []),
     ];
+
     people.forEach(({ role, person }) => {
       if (!person) return;
       const personId = person?.id || role;
@@ -97,27 +128,33 @@ export function validateMembers(entries, photos = {}) {
       }
       if (typeof person.id !== "string" || !person.id.trim())
         personError(personId, "id", "is required.");
-      else if (
-        personIds.has(person.id) &&
-        !person.shared
-      )
-        personError(
-          personId,
-          "id",
-          `is duplicated across teams (first used in ${personIds.get(person.id)}). Set shared: true if intentional.`,
-        );
-      if (person.id) personIds.set(person.id, id);
+      else {
+        const prev = personIds.get(person.id);
+        if (prev && prev.scope === "team" && prev.id !== id && !person.shared) {
+          personError(
+            personId,
+            "id",
+            `is duplicated across teams (first used in ${prev.id}). Set shared: true if intentional.`,
+          );
+        }
+      }
+
       if (typeof person.name !== "string" || !person.name.trim())
         personError(personId, "name", "is required.");
       if (typeof person.role !== "string" || !person.role.trim())
         personError(personId, "role", "is required.");
-      if (person.photo != null && typeof person.photo !== "string")
-        personError(personId, "photo", "must be a filename only.");
-      if (person.photo && /[/\\]/.test(person.photo))
-        personError(personId, "photo", "must be a filename only, not a path.");
-      if (person.linkedin != null && !urlOnHost(person.linkedin, LINKEDIN_HOST))
+
+      if (person.photo !== undefined) {
+        personError(
+          personId,
+          "photo",
+          'is not allowed for team members. Team leads, co-leads and members do not have photos; remove the "photo" field.',
+        );
+      }
+
+      if (person.linkedin != null && person.linkedin !== "" && !urlOnHost(person.linkedin, LINKEDIN_HOST))
         personError(personId, "linkedin", "must be an https://linkedin.com/ URL.");
-      if (person.github != null && !urlOnHost(person.github, GITHUB_HOST))
+      if (person.github != null && person.github !== "" && !urlOnHost(person.github, GITHUB_HOST))
         personError(personId, "github", "must be an https://github.com/ URL.");
       if (
         person.placeholder !== undefined &&
@@ -125,50 +162,77 @@ export function validateMembers(entries, photos = {}) {
         person.placeholder !== false
       )
         personError(personId, "placeholder", "must be true or false.");
-    });
 
-    if (team.lead && team.lead.photo) {
-      const meta = photos[team.lead.photo];
-      if (!meta)
-        errors.push(
-          `${id} / lead: "photo" "${team.lead.photo}" not found in photos/.`,
-        );
-      else
-        checkPhotoDimensions(id, "lead", team.lead.photo, meta, errors, warnings);
-    }
-    if (team.coLead && team.coLead.photo) {
-      const meta = photos[team.coLead.photo];
-      if (!meta)
-        errors.push(
-          `${id} / coLead: "photo" "${team.coLead.photo}" not found in photos/.`,
-        );
-      else
-        checkPhotoDimensions(id, "coLead", team.coLead.photo, meta, errors, warnings);
-    }
-    (team.members || []).forEach((person, i) => {
-      if (person.photo) {
-        const meta = photos[person.photo];
-        if (!meta)
-          errors.push(
-            `${id} / member[${i}]: "photo" "${person.photo}" not found in photos/.`,
-          );
-        else
-          checkPhotoDimensions(id, `member[${i}]`, person.photo, meta, errors, warnings);
-      }
+      registerPerson("team", id, person);
     });
+  });
+
+  // Validate board
+  board.forEach((entry, index) => {
+    const id = entry?.id || `board ${index + 1}`;
+    const error = (field, message) => errors.push(`board "${id}": "${field}" ${message}`);
+
+    if (!entry || typeof entry !== "object") {
+      errors.push(`board: entry ${index + 1} must be an object.`);
+      return;
+    }
+
+    if (typeof entry.id !== "string" || !entry.id.trim())
+      error("id", "is required. Give this board member a unique id.");
+    else if (boardIds.has(entry.id))
+      error("id", "is duplicated. Every board member needs a different id.");
+    boardIds.add(entry.id);
+
+    if (typeof entry.name !== "string" || !entry.name.trim())
+      error("name", "is required. Give this board member a name.");
+
+    if (typeof entry.designation !== "string" || !entry.designation.trim())
+      error("designation", "is required. Give this board member a designation.");
+
+    if (
+      entry.placeholder !== undefined &&
+      entry.placeholder !== true &&
+      entry.placeholder !== false
+    )
+      error("placeholder", "must be true or false.");
+
+    if (entry.order !== undefined && typeof entry.order !== "number")
+      error("order", "must be a number.");
+
+    if (entry.linkedin != null && entry.linkedin !== "" && !urlOnHost(entry.linkedin, LINKEDIN_HOST))
+      error("linkedin", "must be an https://linkedin.com/ URL.");
+
+    if (entry.github != null && entry.github !== "" && !urlOnHost(entry.github, GITHUB_HOST))
+      error("github", "must be an https://github.com/ URL.");
+
+    if (entry.photo != null && entry.photo !== "") {
+      if (typeof entry.photo !== "string")
+        error("photo", "must be a filename only.");
+      else if (/[/\\]/.test(entry.photo))
+        error("photo", "must be a filename only, not a path.");
+      else {
+        const meta = photos[entry.photo];
+        if (!meta)
+          errors.push(`board "${id}": "photo" "${entry.photo}" not found in photos/board/.`);
+        else
+          checkPhotoDimensions(`board "${id}"`, entry.photo, meta, errors, warnings);
+      }
+    }
+
+    registerPerson("board", id, entry);
   });
 
   return { errors, warnings };
 }
 
-export function prepareMembers(entries, { development = false, resolvePhoto = (name) => name } = {}) {
+export function prepareMembers(entries, { development = false } = {}) {
   const safeEntries = Array.isArray(entries) ? entries.filter((t) => t && typeof t === "object") : [];
   const hasReal = safeEntries.some((team) => team.placeholder !== true);
 
   return safeEntries
     .filter((team) => development || !hasReal || team.placeholder !== true)
     .map((team) => {
-      const personOrFallback = (person) => {
+      const personOrFallback = (person, defaultRole) => {
         if (!person) return null;
         return {
           ...person,
@@ -176,7 +240,7 @@ export function prepareMembers(entries, { development = false, resolvePhoto = (n
           role:
             typeof person.role === "string" && person.role.trim()
               ? person.role
-              : null,
+              : (defaultRole || null),
           branch: typeof person.branch === "string" ? person.branch : null,
           year: typeof person.year === "string" ? person.year : null,
           bio: typeof person.bio === "string" ? person.bio : null,
@@ -188,16 +252,16 @@ export function prepareMembers(entries, { development = false, resolvePhoto = (n
             person.github && urlOnHost(person.github, GITHUB_HOST)
               ? person.github
               : null,
-          photo: person.photo || null,
-          photoSrc: person.photo ? resolvePhoto(person.photo) : null,
           isPlaceholder: person.placeholder === true,
         };
       };
 
-      const lead = personOrFallback(team.lead) || { name: MISSING, role: null };
-      const coLead = personOrFallback(team.coLead) || null;
+      const lead = team.lead
+        ? personOrFallback(team.lead, memberCopy.lead)
+        : { id: `${team.id}-lead-tba`, name: MISSING, role: null };
+      const coLead = personOrFallback(team.coLead, memberCopy.coLead);
       const members = Array.isArray(team.members)
-        ? team.members.map(personOrFallback).filter(Boolean)
+        ? team.members.map((m) => personOrFallback(m, memberCopy.members)).filter(Boolean)
         : [];
 
       return {
@@ -214,3 +278,31 @@ export function prepareMembers(entries, { development = false, resolvePhoto = (n
     });
 }
 
+export function prepareBoard(entries, { development = false, resolvePhoto = (name) => name } = {}) {
+  const safeEntries = Array.isArray(entries) ? entries.filter((b) => b && typeof b === "object") : [];
+  const hasReal = safeEntries.some((b) => b.placeholder !== true);
+
+  return safeEntries
+    .filter((b) => development || !hasReal || b.placeholder !== true)
+    .sort((a, b) => {
+      const orderA = typeof a.order === "number" ? a.order : Infinity;
+      const orderB = typeof b.order === "number" ? b.order : Infinity;
+      return orderA - orderB;
+    })
+    .map((member) => ({
+      ...member,
+      name: textOrFallback(member.name),
+      designation: textOrFallback(member.designation),
+      linkedin:
+        member.linkedin && urlOnHost(member.linkedin, LINKEDIN_HOST)
+          ? member.linkedin
+          : null,
+      github:
+        member.github && urlOnHost(member.github, GITHUB_HOST)
+          ? member.github
+          : null,
+      photo: member.photo || null,
+      photoSrc: member.photo ? resolvePhoto(member.photo) : null,
+      isPlaceholder: member.placeholder === true,
+    }));
+}

@@ -1,22 +1,29 @@
-import { teams as entries } from "./members.js";
-import { prepareMembers, validateMembers } from "./memberModel.js";
+import { teams as teamEntries, board as boardEntries } from "./members.js";
+import { prepareMembers, prepareBoard, validateMembers } from "./memberModel.js";
 
-const photos = import.meta.glob("./photos/*.{webp,png,jpg,jpeg,svg}", {
-  eager: true,
-  query: "?url",
-  import: "default",
-});
-const byName = Object.fromEntries(
-  Object.entries(photos).map(([path, url]) => [path.split("/").at(-1), url]),
+const boardPhotos = import.meta.glob(
+  ["./photos/board/*.{webp,png,jpg,jpeg,svg}", "./photos/*.{webp,png,jpg,jpeg,svg}"],
+  {
+    eager: true,
+    query: "?url",
+    import: "default",
+  },
+);
+const boardByName = Object.fromEntries(
+  Object.entries(boardPhotos).map(([path, url]) => [path.split("/").at(-1), url]),
 );
 
-export const teams = prepareMembers(entries, {
+export const teams = prepareMembers(teamEntries, {
   development: import.meta.env.DEV,
-  resolvePhoto: (filename) => byName[filename] || null,
+});
+
+export const board = prepareBoard(boardEntries, {
+  development: import.meta.env.DEV,
+  resolvePhoto: (filename) => boardByName[filename] || null,
 });
 
 if (import.meta.env.DEV) {
-  const report = validateMembers(entries, {});
+  const report = validateMembers(teamEntries, boardEntries, {});
   [...report.errors, ...report.warnings].forEach((message) =>
     console.warn(message),
   );
