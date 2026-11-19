@@ -171,36 +171,5 @@ export const teams = [
   },
 ];
 
-export const board = [
-  {
-    id: "president",
-    name: "President (TBA)",
-    designation: "Club President",
-    placeholder: true,
-  },
-  {
-    id: "vp-technical",
-    name: "Vice President (TBA)",
-    designation: "Technical",
-    placeholder: true,
-  },
-  {
-    id: "vp-design",
-    name: "Vice President (TBA)",
-    designation: "Design",
-    placeholder: true,
-  },
-  {
-    id: "secretary",
-    name: "Secretary (TBA)",
-    designation: "Records & communications",
-    placeholder: true,
-  },
-  {
-    id: "treasurer",
-    name: "Treasurer (TBA)",
-    designation: "Budget & operations",
-    placeholder: true,
-  },
-];
+export const board = [];
 

@@ -68,6 +68,9 @@ export default function MembersSection() {
   const activeIndexRef = useRef(0);
   const isPinnedRef = useRef(false);
   const triggerRef = useRef(null);
+  const isScrubbingRef = useRef(false);
+  const isUserClickRef = useRef(false);
+  const trackPositionsRef = useRef({ startX: 0, endX: 0 });
 
   /* DOM refs */
   const stageRef = useRef(null);
@@ -172,47 +175,67 @@ export default function MembersSection() {
     splitInstances.current = [];
 
     if (!reduced) {
-      /* 1. Clip-path dropdown wipe on panel inner */
-      if (panelInnerRef.current) {
-        gsap.fromTo(
-          panelInnerRef.current,
-          { clipPath: "inset(0 0 100% 0 round 0px)", opacity: 0 },
-          {
-            clipPath: "inset(0 0 0% 0 round 0px)",
-            opacity: 1,
-            duration: 0.55,
-            ease: "power3.out",
-            overwrite: "auto",
-          },
-        );
-      }
-
-      /* 2. SplitType line-mask reveal for lead + co-lead names */
-      [leadNameRef.current, coLeadNameRef.current]
-        .filter(Boolean)
-        .forEach((el, i) => {
-          const split = new SplitType(el, { types: "chars" });
-          splitInstances.current.push(split);
+      if (isUserClickRef.current) {
+        isUserClickRef.current = false;
+        /* 1. Clip-path dropdown wipe on panel inner for explicit user clicks/keys */
+        if (panelInnerRef.current) {
           gsap.fromTo(
-            split.chars,
-            { yPercent: 110 },
+            panelInnerRef.current,
+            { clipPath: "inset(0 0 100% 0 round 0px)", opacity: 0 },
             {
-              yPercent: 0,
-              stagger: 0.022,
-              duration: 0.65,
-              delay: 0.1 + i * 0.08,
-              ease: "power4.out",
+              clipPath: "inset(0 0 0% 0 round 0px)",
+              opacity: 1,
+              duration: 0.45,
+              ease: "power3.out",
               overwrite: "auto",
             },
           );
-        });
+        }
+
+        /* 2. SplitType line-mask reveal for lead + co-lead names */
+        [leadNameRef.current, coLeadNameRef.current]
+          .filter(Boolean)
+          .forEach((el, i) => {
+            const split = new SplitType(el, { types: "chars" });
+            splitInstances.current.push(split);
+            gsap.fromTo(
+              split.chars,
+              { yPercent: 110 },
+              {
+                yPercent: 0,
+                stagger: 0.02,
+                duration: 0.5,
+                delay: 0.08 + i * 0.06,
+                ease: "power4.out",
+                overwrite: "auto",
+              },
+            );
+          });
+      } else {
+        /* Subtle, fast fade for scroll transitions to prevent layout thrashing */
+        if (panelInnerRef.current) {
+          gsap.fromTo(
+            panelInnerRef.current,
+            { opacity: 0.35, y: 6 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.22,
+              ease: "power2.out",
+              overwrite: "auto",
+            },
+          );
+        }
+      }
     }
 
-    /* Tab visuals (always, even with reduced motion — no transitions in CSS) */
-    if (lastIndex > 0) {
-      updateTabVisualsRef.current?.(activeIndex / lastIndex);
-    } else {
-      updateTabVisualsRef.current?.(0);
+    /* Tab visuals: ONLY update discrete progress when not actively scrubbing with ScrollTrigger */
+    if (!isScrubbingRef.current) {
+      if (lastIndex > 0) {
+        updateTabVisualsRef.current?.(activeIndex / lastIndex);
+      } else {
+        updateTabVisualsRef.current?.(0);
+      }
     }
 
     return () => {
@@ -272,7 +295,9 @@ export default function MembersSection() {
         return { startX, endX };
       };
 
-      const { startX, endX } = getTrackPositions();
+      const positions = getTrackPositions();
+      trackPositionsRef.current = positions;
+      const { startX, endX } = positions;
       const initialProgress = lastIndex > 0 ? activeIndexRef.current / lastIndex : 0;
       gsap.set(track, { x: startX + initialProgress * (endX - startX) });
 
@@ -286,15 +311,25 @@ export default function MembersSection() {
         pin: true,
         start: "top top",
         end: () => `+=${scrollDistance}`,
-        scrub: 0.4,
+        scrub: 0.6,
         snap: {
           snapTo: 1 / (teamCount - 1),
-          duration: { min: 0.15, max: 0.35 },
-          delay: 0.05,
-          ease: "power1.inOut",
+          duration: { min: 0.2, max: 0.35 },
+          delay: 0.25,
+          ease: "power2.out",
+          inertia: false,
+        },
+        onScrubStart: () => {
+          isScrubbingRef.current = true;
+        },
+        onScrubComplete: () => {
+          isScrubbingRef.current = false;
+        },
+        onSnapComplete: () => {
+          isScrubbingRef.current = false;
         },
         onUpdate: (self) => {
-          const { startX: sX, endX: eX } = getTrackPositions();
+          const { startX: sX, endX: eX } = trackPositionsRef.current;
           const curX = sX + self.progress * (eX - sX);
           gsap.set(track, { x: curX });
 
@@ -308,9 +343,10 @@ export default function MembersSection() {
           }
         },
         onRefresh: () => {
-          const { startX: sX, endX: eX } = getTrackPositions();
+          const refreshed = getTrackPositions();
+          trackPositionsRef.current = refreshed;
           if (st) {
-            const curX = sX + st.progress * (eX - sX);
+            const curX = refreshed.startX + st.progress * (refreshed.endX - refreshed.startX);
             gsap.set(track, { x: curX });
             updateTabVisualsRef.current?.(st.progress);
           }
@@ -348,10 +384,30 @@ export default function MembersSection() {
     };
   }, [teamCount, lastIndex, reduced]);
 
+  /* ── Trackpad horizontal swipe / Shift+wheel support ──────────────────── */
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    const onWheel = (e) => {
+      // Horizontal swipe on trackpad (deltaX) or Shift+Wheel
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 2) {
+        if (isPinnedRef.current && triggerRef.current) {
+          e.preventDefault();
+          window.scrollBy({ top: e.deltaX, behavior: "auto" });
+        }
+      }
+    };
+    stage.addEventListener("wheel", onWheel, { passive: false });
+    return () => stage.removeEventListener("wheel", onWheel);
+  }, []);
+
   /* ── Controls ─────────────────────────────────────────────────────────── */
 
   const selectTeam = (index, userInitiated = true) => {
     if (index < 0 || index >= teamCount) return;
+    if (userInitiated) {
+      isUserClickRef.current = true;
+    }
     setOpenId(null);
     setActiveIndex(index);
     activeIndexRef.current = index;
