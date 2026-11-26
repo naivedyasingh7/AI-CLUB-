@@ -54,7 +54,7 @@ export default function Solution() {
             </video>
           </div>
           <div className="solution-content relative z-10">
-            <span className="solution-label" animate-blur-text="true">THE COMMUNITY</span>
+            <span className="solution-label" animate-blur-text="true">THE CLUB</span>
             <h2 className="title" animate-blur-text="true">Practical Experience Can Define You</h2>
           </div>
         </div>
@@ -82,7 +82,7 @@ export default function Solution() {
             </video>
           </div>
           <div className="solution-content relative z-10">
-            <span className="solution-label" animate-blur-text="true">THE COMMUNITY</span>
+            <span className="solution-label" animate-blur-text="true">THE CLUB</span>
             <h2 className="title" animate-blur-text="true">Collaborative learning gives you an edge</h2>
           </div>
         </div>

@@ -12,7 +12,7 @@ export default function StartedCTA() {
 
       <div className="started-content relative z-10 max-w-3xl flex flex-col items-center gap-6">
         <span className="started-label font-mono text-sm tracking-wider uppercase opacity-80" animate-blur-text="true">
-          AI Club is the premier technical community
+          AI Club is the premier technical club
         </span>
 
         <h2 className="title-md font-normal" animate-blur-text="true">

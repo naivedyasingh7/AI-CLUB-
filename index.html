@@ -20,6 +20,33 @@
                 top: -50px !important;
                 font-size: 24px !important;
             }
+            .hero-canvas-container {
+                position: absolute;
+                inset: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 1;
+                pointer-events: auto;
+                overflow: hidden;
+            }
+            .hero-canvas-container canvas {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100% !important;
+                height: 100% !important;
+                display: block;
+            }
+            .hero-content {
+                position: relative;
+                z-index: 5;
+                pointer-events: none;
+            }
+            .hero-content a,
+            .hero-content button,
+            .hero-content .hero-glitch-trigger {
+                pointer-events: auto;
+            }
         </style>
     </head>
     <body>
@@ -84,13 +111,12 @@
 <script type="module" src="/src/loader-entry.jsx"></script>
 
 <section id="home" class="hero">
-    <video preload playsinline autoplay loop muted class="hero-bg">
-        <source src="https://hackfirst.io/video/tornado-home.mp4" type="video/mp4">
-    </video>
+    <div id="hero-canvas-container" class="hero-canvas-container"></div>
+    <script type="module" src="/src/hero-canvas.js"></script>
     <div class="hero-content">
         <img src="/img/svg/ai-club-logo-custom.svg" alt="A.I. CLUB Graphic Logo" style="width: 250px; margin-bottom: 20px; display: block; transform: translateX(30px);" animate-blur-el />
         <span class="hero-label" animate-blur-text>TENURE 26-27</span>
-        <h1 class="hero-title" animate-blur-text><span class="hero-glitch-trigger" style="display:inline-block; cursor:crosshair;">AI CLUB</span><br>18 Community Groups:<br>Event Management, PR, AI/ML &amp; more.</h1>
+        <h1 class="hero-title" animate-blur-text><span class="hero-glitch-trigger" style="display:inline-block; cursor:crosshair;">AI CLUB</span><br>13 Club Groups:<br>Web Dev, Design, AI/ML,<br>PR, Events &amp; more.</h1>
     </div>
 </section>
 
@@ -128,7 +154,7 @@
             <div class="introduction-list__value">
                 <b data-counter>200+</b>
             </div>
-            <div class="introduction-list__text">active community members</div>
+            <div class="introduction-list__text">active club members</div>
         </div>
     </div>
 </section>
@@ -218,7 +244,7 @@
         <span>01</span>
     </div>
     <img src="/img/svg/ai-club-logo-black.svg" alt="AI CLUB" animate-blur-el loading="lazy">
-    <p class="hackfirst-text" animate-blur-text>The ultimate community for modern AI engineers</p>
+    <p class="hackfirst-text" animate-blur-text>The ultimate club for modern AI engineers</p>
 </section>
 
 <section class="about-video">
@@ -228,7 +254,7 @@
 <section id="about" class="about" data-layout="02">
     <div class="about-line">
         <span>A</span>
-        <span>community</span>
+        <span>club</span>
         <span>of</span>
         <span>the</span>
         <span>best</span>
@@ -320,7 +346,7 @@
 <section class="started">
     <video preload playsinline autoplay loop muted class="started-bg" lazy-video data-src="https://hackfirst.io/video/started.mp4"></video>
     <div class="started-content">
-        <span class="started-label" animate-blur-text>AI Club is the premier technical community</span>
+        <span class="started-label" animate-blur-text>AI Club is the premier technical club</span>
         <h2 class="title-md" animate-blur-text>Are you truly ready to build the future of AI?</h2>
         <p class="started-text" animate-blur-text>With AI Club's intensive research groups, you're not just learning theory — you're building reality</p>
         <a href="#contacts" class="started-btn" animate-blur-el>Get started</a>

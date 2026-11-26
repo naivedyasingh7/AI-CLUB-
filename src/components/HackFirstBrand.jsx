@@ -11,7 +11,7 @@ export default function HackFirstBrand() {
       <img src="/img/svg/logo-black-new.svg" alt="AI Club Logo Dark" className="my-auto" />
 
       <p className="hackfirst-text">
-        The ultimate community for modern AI innovation
+        The ultimate club for modern AI innovation
       </p>
     </section>
   );

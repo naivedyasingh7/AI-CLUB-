@@ -2,7 +2,7 @@ import React from 'react';
 
 
 export default function AboutSection() {
-  const tickerWords = ['A', 'community', 'of', 'the', 'best', 'independent', 'student', 'researchers'];
+  const tickerWords = ['A', 'club', 'of', 'the', 'best', 'independent', 'student', 'researchers'];
 
   return (
     <>
@@ -21,7 +21,7 @@ export default function AboutSection() {
         </div>
 
         <div className="about-content">
-          <span className="about-label" animate-blur-text="true">Community &amp; Projects</span>
+          <span className="about-label" animate-blur-text="true">Club &amp; Projects</span>
           <h2 className="title-md" animate-blur-text="true">
             <span>AI Club teams build state-of-the-art models in</span> collaborative environments that push boundaries
           </h2>
