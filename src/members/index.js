@@ -1,3 +1,4 @@
+// AI Club team members & panel coordinator
 import { teams as teamEntries, board as boardEntries } from "./members.js";
 import { prepareMembers, prepareBoard, validateMembers } from "./memberModel.js";
 
@@ -15,6 +16,7 @@ const boardByName = Object.fromEntries(
 
 export const teams = prepareMembers(teamEntries, {
   development: import.meta.env.DEV,
+  resolvePhoto: (filename) => boardByName[filename] || null,
 });
 
 export const board = prepareBoard(boardEntries, {
@@ -23,7 +25,10 @@ export const board = prepareBoard(boardEntries, {
 });
 
 if (import.meta.env.DEV) {
-  const report = validateMembers(teamEntries, boardEntries, {});
+  const meta = Object.fromEntries(
+    Object.keys(boardByName).map((name) => [name, { width: 800, height: 1000 }]),
+  );
+  const report = validateMembers(teamEntries, boardEntries, meta);
   [...report.errors, ...report.warnings].forEach((message) =>
     console.warn(message),
   );

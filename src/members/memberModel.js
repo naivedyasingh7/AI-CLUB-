@@ -112,8 +112,12 @@ export function validateMembers(teams = [], board = [], photos = {}) {
       error("placeholder", "must be true or false.");
 
     const people = [
-      { role: "lead", person: team.lead },
-      { role: "coLead", person: team.coLead },
+      ...(Array.isArray(team.leads)
+        ? team.leads.map((person, i) => ({ role: `lead[${i}]`, person }))
+        : team.lead ? [{ role: "lead", person: team.lead }] : []),
+      ...(Array.isArray(team.coLeads)
+        ? team.coLeads.map((person, i) => ({ role: `coLead[${i}]`, person }))
+        : team.coLead ? [{ role: "coLead", person: team.coLead }] : []),
       ...(Array.isArray(team.members)
         ? team.members.map((person, i) => ({ role: `member[${i}]`, person }))
         : []),
@@ -144,12 +148,18 @@ export function validateMembers(teams = [], board = [], photos = {}) {
       if (typeof person.role !== "string" || !person.role.trim())
         personError(personId, "role", "is required.");
 
-      if (person.photo !== undefined) {
-        personError(
-          personId,
-          "photo",
-          'is not allowed for team members. Team leads, co-leads and members do not have photos; remove the "photo" field.',
-        );
+      if (person.photo != null && person.photo !== "") {
+        if (typeof person.photo !== "string")
+          personError(personId, "photo", "must be a filename only.");
+        else if (/[/\\]/.test(person.photo))
+          personError(personId, "photo", "must be a filename only, not a path.");
+        else {
+          const meta = photos[person.photo];
+          if (!meta)
+            errors.push(`${id} / ${personId}: "photo" "${person.photo}" not found in photos/.`);
+          else
+            checkPhotoDimensions(`${id} / ${personId}`, person.photo, meta, errors, warnings);
+        }
       }
 
       if (person.linkedin != null && person.linkedin !== "" && !urlOnHost(person.linkedin, LINKEDIN_HOST))
@@ -225,7 +235,7 @@ export function validateMembers(teams = [], board = [], photos = {}) {
   return { errors, warnings };
 }
 
-export function prepareMembers(entries, { development = false } = {}) {
+export function prepareMembers(entries, { development = false, resolvePhoto = (name) => name } = {}) {
   const safeEntries = Array.isArray(entries) ? entries.filter((t) => t && typeof t === "object") : [];
   const hasReal = safeEntries.some((team) => team.placeholder !== true);
 
@@ -252,26 +262,41 @@ export function prepareMembers(entries, { development = false } = {}) {
             person.github && urlOnHost(person.github, GITHUB_HOST)
               ? person.github
               : null,
+          photo: person.photo || null,
+          photoSrc: person.photo ? resolvePhoto(person.photo) : null,
           isPlaceholder: person.placeholder === true,
         };
       };
 
       const lead = team.lead
         ? personOrFallback(team.lead, memberCopy.lead)
-        : { id: `${team.id}-lead-tba`, name: MISSING, role: null };
+        : null;
       const coLead = personOrFallback(team.coLead, memberCopy.coLead);
+      const leads = Array.isArray(team.leads)
+        ? team.leads.map((p) => personOrFallback(p, memberCopy.lead)).filter(Boolean)
+        : lead ? [lead] : [];
+      const coLeads = Array.isArray(team.coLeads)
+        ? team.coLeads.map((p) => personOrFallback(p, memberCopy.coLead)).filter(Boolean)
+        : coLead ? [coLead] : [];
       const members = Array.isArray(team.members)
         ? team.members.map((m) => personOrFallback(m, memberCopy.members)).filter(Boolean)
         : [];
+
+      const count =
+        (leads.length || (lead ? 1 : 0)) +
+        (coLeads.length || (coLead ? 1 : 0)) +
+        members.length;
 
       return {
         ...team,
         name: textOrFallback(team.name),
         tagline: typeof team.tagline === "string" ? team.tagline : null,
-        lead,
-        coLead,
+        lead: lead || (leads[0] || { id: `${team.id}-lead-tba`, name: MISSING, role: null }),
+        coLead: coLead || (coLeads[0] || null),
+        leads,
+        coLeads,
         members,
-        memberCount: (team.lead ? 1 : 0) + (team.coLead ? 1 : 0) + (Array.isArray(team.members) ? team.members.length : 0),
+        memberCount: count,
         isPlaceholder: team.placeholder === true,
         development: team.placeholder === true,
       };

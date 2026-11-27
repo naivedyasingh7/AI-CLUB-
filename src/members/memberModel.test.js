@@ -154,7 +154,7 @@ test("person shared across board and team must have consistent details", () => {
   assert.ok(inconsistent.errors.some((m) => m.includes("differ")));
 });
 
-test("team persons must NOT have photos", () => {
+test("team persons can have valid photos", () => {
   const leadWithPhoto = {
     ...baseTeam,
     lead: { ...baseTeam.lead, photo: "portrait.webp" },
@@ -165,14 +165,10 @@ test("team persons must NOT have photos", () => {
   };
 
   const res1 = validateMembers([leadWithPhoto], baseBoard, validPhotos);
-  assert.ok(
-    res1.errors.some((m) => m.includes("photo") && m.includes("not allowed")),
-  );
+  assert.deepEqual(res1.errors, []);
 
   const res2 = validateMembers([memberWithPhoto], baseBoard, validPhotos);
-  assert.ok(
-    res2.errors.some((m) => m.includes("photo") && m.includes("not allowed")),
-  );
+  assert.deepEqual(res2.errors, []);
 });
 
 test("linkedin and github must be https on the expected host", () => {

@@ -1,175 +1,378 @@
-// AI Club team roster.
-//
-// Edit only this file. Put board photos in src/members/photos/board/ and
-// reference them by filename only (for example `photo: "president.webp"`).
-// Team leads, co-leads and members do NOT have photos.
-// Do not invent real names, bios or social links; use "(TBA)" placeholders
-// until details exist.
-//
-// Placeholder behaviour: entries marked `placeholder: true` show in
-// development. In production they disappear once at least one real entry
-// exists; if every entry is a placeholder they remain so the section is
-// never empty.
+// AI Club team roster & executive leadership.
+// Photos reside in src/members/photos/ and src/members/photos/board/
 
-/* TEAM TEMPLATE: copy this object into the teams array below, including the trailing comma.
-{
-  id: "technical",                 // REQUIRED: unique lowercase id; never reuse it.
-  name: "Technical",               // REQUIRED: team name shown in the rail and panel.
-  tagline: "Core models and research.", // Optional short line under the name.
-  lead: {                          // Optional; omitted = "To be announced".
-    id: "technical-lead",
-    name: "Lead (TBA)",
-    role: "Team Lead",
-    placeholder: true,
+export const board = [
+  {
+    id: "divya-dorai",
+    name: "Divya Dorai",
+    designation: "Student Coordinator",
+    photo: "divya-dorai.jpg",
+    order: 1,
+    placeholder: false,
   },
-  coLead: {                        // Optional; may be absent entirely.
-    id: "technical-co-lead",
-    name: "Co-lead (TBA)",
-    role: "Co-lead",
-    placeholder: true,
+  {
+    id: "shashwat-mishra",
+    name: "Shashwat Mishra",
+    designation: "Student Coordinator",
+    photo: "shashwat-mishra-new.jpg",
+    order: 2,
+    placeholder: false,
   },
-  members: [                       // Remaining members below Lead/Co-lead.
-    {
-      id: "technical-member-1",
-      name: "Member (TBA)",
-      role: "Member",
-      branch: "CSE",               // Optional.
-      year: "2nd year",            // Optional.
-      bio: "",                     // Optional short paragraph.
-      linkedin: "",                // Optional https://linkedin.com/in/... only.
-      github: "",                  // Optional https://github.com/... only.
-      placeholder: true,
-    },
-  ],
-  placeholder: false,              // Optional: true = development preview team.
-},
-*/
-
-/* BOARD TEMPLATE: copy this object into the board array below, including the trailing comma.
-{
-  id: "president",              // REQUIRED: unique lowercase id; never reuse it.
-  name: "President (TBA)",      // REQUIRED: name shown on the board card.
-  designation: "Club President", // REQUIRED: role shown under the name.
-  photo: "president.webp",      // Optional filename from photos/board/; no paths.
-  linkedin: "",                 // Optional https://linkedin.com/in/... only.
-  github: "",                   // Optional https://github.com/... only.
-  order: 1,                     // Optional sort order; omitted = appended in file order.
-  placeholder: true,            // Optional: true = development preview board entry.
-},
-*/
+  {
+    id: "aadya-mishra",
+    name: "Aadya Mishra",
+    designation: "Administrator",
+    photo: "aadya-mishra.jpg",
+    order: 3,
+    placeholder: false,
+  },
+  {
+    id: "akshat-singh",
+    name: "Akshat Singh",
+    designation: "Administrator",
+    photo: "akshat-singh.jpg",
+    order: 4,
+    placeholder: false,
+  },
+  {
+    id: "atiksh-prasad",
+    name: "Atiksh Prasad",
+    designation: "Administrator",
+    photo: "atiksh-prasad-new.jpg",
+    order: 5,
+    placeholder: false,
+  },
+  {
+    id: "sejal-singh",
+    name: "Sejal Singh",
+    designation: "Administrator",
+    photo: "sejal-singh-new.jpg",
+    order: 6,
+    placeholder: false,
+  },
+  {
+    id: "rishi-goyal",
+    name: "Rishi Goyal",
+    designation: "Auditor",
+    photo: "rishi-goyal-new.jpg",
+    order: 7,
+    placeholder: false,
+  },
+];
 
 export const teams = [
   {
-    id: "technical",
-    name: "Technical",
-    tagline: "Core models and research.",
+    id: "aiml",
+    name: "AIML",
+    tagline: "Machine learning, AI models, and intelligent systems.",
     lead: {
-      id: "technical-lead",
-      name: "Lead (TBA)",
+      id: "khushi-roy",
+      name: "Khushi Roy",
       role: "Team Lead",
-      placeholder: true,
+      photo: "khushi-roy-new.jpg",
     },
     coLead: {
-      id: "technical-co-lead",
-      name: "Co-lead (TBA)",
-      role: "Co-lead",
-      placeholder: true,
+      id: "manya-gupta",
+      name: "Manya Gupta",
+      role: "Co-Lead",
+      photo: "manya-gupta-new.jpg",
     },
-    members: [
-      {
-        id: "technical-member-1",
-        name: "Member (TBA)",
-        role: "Member",
-        placeholder: true,
-      },
-    ],
-    placeholder: true,
+    placeholder: false,
   },
   {
-    id: "web-development",
-    name: "Web Development",
-    tagline: "Sites, dashboards and club tooling.",
+    id: "content",
+    name: "Content",
+    tagline: "Editorial, documentation, and storytelling.",
     lead: {
-      id: "web-development-lead",
-      name: "Lead (TBA)",
+      id: "tanmays-swain",
+      name: "Tanmays Swain",
       role: "Team Lead",
-      placeholder: true,
+      photo: "tanmays-swain-new.jpg",
     },
-    members: [
-      {
-        id: "web-development-member-1",
-        name: "Member (TBA)",
-        role: "Member",
-        placeholder: true,
-      },
-    ],
-    placeholder: true,
+    coLead: {
+      id: "malaika-bala",
+      name: "Malaika Bala",
+      role: "Co-Lead",
+      photo: "malaika-bala.jpg",
+    },
+    placeholder: false,
   },
   {
     id: "design",
     name: "Design",
-    tagline: "Visual identity and prototypes.",
+    tagline: "Visual identity, UI/UX, and creative media.",
     lead: {
-      id: "design-lead",
-      name: "Lead (TBA)",
+      id: "harshika-sunkara",
+      name: "Harshika Sunkara",
       role: "Team Lead",
-      placeholder: true,
+      photo: "harshika-sunkara.jpg",
     },
-    coLead: {
-      id: "design-co-lead",
-      name: "Co-lead (TBA)",
-      role: "Co-lead",
-      placeholder: true,
-    },
-    members: [],
-    placeholder: true,
+    coLeads: [
+      {
+        id: "sakshi",
+        name: "Sakshi",
+        role: "Co-Lead",
+        photo: "sakshi-new.jpg",
+      },
+      {
+        id: "ayush-saxena",
+        name: "Ayush Saxena",
+        role: "Co-Lead",
+        photo: "ayush-saxena.jpg",
+      },
+    ],
+    placeholder: false,
   },
   {
-    id: "pr",
-    name: "PR",
-    tagline: "Outreach and communications.",
+    id: "electronics-iot",
+    name: "Electronics & IOT",
+    tagline: "Hardware, robotics, and embedded intelligence.",
     lead: {
-      id: "pr-lead",
-      name: "Lead (TBA)",
+      id: "rishan-manna",
+      name: "Rishan Manna",
       role: "Team Lead",
-      placeholder: true,
+      photo: "rishan-manna.jpg",
     },
-    members: [],
-    placeholder: true,
+    coLeads: [
+      {
+        id: "kowshik-raj-r",
+        name: "Kowshik Raj R",
+        role: "Co-Lead",
+        photo: "kowshik-raj-r.jpg",
+      },
+      {
+        id: "yash-shah",
+        name: "Yash Shah",
+        role: "Co-Lead",
+        photo: "yash-shah.jpg",
+      },
+    ],
+    placeholder: false,
   },
   {
     id: "event-management",
     name: "Event Management",
-    tagline: "Meetups, workshops and demos.",
+    tagline: "Hackathons, meetups, workshops, and demos.",
     lead: {
-      id: "event-management-lead",
-      name: "Lead (TBA)",
+      id: "dhananjay-singh",
+      name: "Dhananjay Singh",
+      role: "Team Lead",
+      photo: "dhananjay-singh-new.jpg",
+      shared: true,
+    },
+    coLeads: [
+      {
+        id: "adarsh-shastri",
+        name: "Adarsh Shastri",
+        role: "Co-Lead",
+        photo: "adarsh-shastri-new.jpg",
+      },
+      {
+        id: "shruti-srivastava",
+        name: "Shruti Srivastava",
+        role: "Co-Lead",
+        photo: "shruti-srivastava.jpg",
+      },
+      {
+        id: "yuvraj-mall",
+        name: "Yuvraj Mall",
+        role: "Co-Lead",
+        photo: "yuvraj-mall.jpg",
+      },
+    ],
+    placeholder: false,
+  },
+  {
+    id: "finance",
+    name: "Finance",
+    tagline: "Budgeting, fiscal planning, and sponsorships.",
+    lead: {
+      id: "finance-lead-tba",
+      name: "To be announced",
       role: "Team Lead",
       placeholder: true,
     },
-    coLead: {
-      id: "event-management-co-lead",
-      name: "Co-lead (TBA)",
-      role: "Co-lead",
-      placeholder: true,
-    },
-    members: [
+    coLeads: [
       {
-        id: "event-management-member-1",
-        name: "Member (TBA)",
-        role: "Member",
-        placeholder: true,
+        id: "priyanshu-kumar",
+        name: "Priyanshu Kumar",
+        role: "Co-Lead",
+        photo: "priyanshu-kumar.jpg",
       },
       {
-        id: "event-management-member-2",
-        name: "Member (TBA)",
-        role: "Member",
-        placeholder: true,
+        id: "shaily-patel",
+        name: "Shaily Patel",
+        role: "Co-Lead",
+        photo: "shaily-patel.jpg",
       },
     ],
-    placeholder: true,
+    placeholder: false,
+  },
+  {
+    id: "hr-resources",
+    name: "HR & Resources",
+    tagline: "Talent acquisition, internal culture, and operations.",
+    lead: {
+      id: "katyayani-roy",
+      name: "Katyayani Roy",
+      role: "Team Lead",
+      photo: "katyayani-roy.jpg",
+    },
+    coLeads: [
+      {
+        id: "adyasha-mohanty",
+        name: "Adyasha Mohanty",
+        role: "Co-Lead",
+        photo: "adyasha-mohanty-new.jpg",
+      },
+      {
+        id: "bitan-deb",
+        name: "Bitan Deb",
+        role: "Co-Lead",
+        photo: "bitan-deb-new.jpg",
+      },
+    ],
+    placeholder: false,
+  },
+  {
+    id: "operational",
+    name: "Operational",
+    tagline: "Execution, logistics, and club coordination.",
+    leads: [
+      {
+        id: "khushi-gupta",
+        name: "Khushi Gupta",
+        role: "Team Lead",
+        photo: "khushi-gupta.jpg",
+      },
+      {
+        id: "parag-goyal",
+        name: "Parag Goyal",
+        role: "Team Lead",
+        photo: "parag-goyal.jpg",
+      },
+    ],
+    coLead: {
+      id: "kunwar-vedant-pratap-singh",
+      name: "Kunwar Vedant Pratap Singh",
+      role: "Co-Lead",
+      photo: "kunwar-vedant-pratap-singh-new.jpg",
+    },
+    placeholder: false,
+  },
+  {
+    id: "pr-outreach",
+    name: "PR & Outreach",
+    tagline: "External partnerships, communications, and public relations.",
+    lead: {
+      id: "angel-verman",
+      name: "Angel Verman",
+      role: "Team Lead",
+      photo: "angel-verman.jpg",
+      shared: true,
+    },
+    coLeads: [
+      {
+        id: "diya-singh",
+        name: "Diya Singh",
+        role: "Co-Lead",
+        photo: "diya-singh.jpg",
+      },
+      {
+        id: "jensi-patel",
+        name: "Jensi Patel",
+        role: "Co-Lead",
+        photo: "jensi-patel.jpg",
+      },
+    ],
+    placeholder: false,
+  },
+  {
+    id: "research",
+    name: "Research",
+    tagline: "AI publications, deep tech papers, and experiments.",
+    lead: {
+      id: "kushagra-singh",
+      name: "Kushagra Singh",
+      role: "Team Lead",
+      photo: "kushagra-singh.jpg",
+    },
+    coLead: {
+      id: "suvradeep-datta",
+      name: "Suvradeep Datta",
+      role: "Co-Lead",
+      photo: "suvradeep-datta-new.jpg",
+    },
+    placeholder: false,
+  },
+  {
+    id: "social-media",
+    name: "Social Media",
+    tagline: "Digital reach, social content, and engagement.",
+    lead: {
+      id: "angel-verman",
+      name: "Angel Verman",
+      role: "Team Lead",
+      photo: "angel-verman.jpg",
+      shared: true,
+    },
+    coLeads: [
+      {
+        id: "dhananjay-singh",
+        name: "Dhananjay Singh",
+        role: "Co-Lead",
+        photo: "dhananjay-singh-new.jpg",
+        shared: true,
+      },
+      {
+        id: "ujjwal-sharma",
+        name: "Ujjwal Sharma",
+        role: "Co-Lead",
+        photo: "ujjwal-sharma-new.jpg",
+      },
+      {
+        id: "aditya-pandey",
+        name: "Aditya Pandey",
+        role: "Design Head",
+        photo: "aditya-pandey-new.jpg",
+      },
+    ],
+    placeholder: false,
+  },
+  {
+    id: "technical",
+    name: "Technical",
+    tagline: "Core technical development and software architectures.",
+    lead: {
+      id: "maddala-jashwanth",
+      name: "Maddala Jashwanth",
+      role: "Team Lead",
+      photo: "maddala-jashwanth.jpg",
+    },
+    coLead: {
+      id: "dulam-anvesh-goud",
+      name: "Dulam Anvesh Goud",
+      role: "Co-Lead",
+      photo: "dulam-anvesh-goud.jpg",
+    },
+    placeholder: false,
+  },
+  {
+    id: "web-development",
+    name: "Web Development",
+    tagline: "Club websites, interactive applications, and tooling.",
+    lead: {
+      id: "naivedya-singh",
+      name: "Naivedya Singh",
+      role: "Team Lead",
+      photo: "naivedya-singh.jpg",
+    },
+    coLead: {
+      id: "ashwin-k-sunil",
+      name: "Ashwin K Sunil",
+      role: "Co-Lead",
+      photo: "ashwin-k-sunil.jpg",
+    },
+    placeholder: false,
   },
 ];
-
-export const board = [];
-

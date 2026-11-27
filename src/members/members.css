@@ -79,10 +79,20 @@ html {
   aspect-ratio: 4 / 5;
   border-radius: 14px;
   overflow: hidden;
-  background: #111;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
   position: relative;
-  border: 1px solid color-mix(in srgb, var(--color-text) 14%, transparent);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.members-board-photo-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.2) 35%, transparent 65%);
+  pointer-events: none;
+  z-index: 3;
 }
 
 .members-board-photo-wrap img {
@@ -318,8 +328,8 @@ html {
 /* Leaders Side-by-Side */
 .members-leaders {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 40px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 32px;
   padding-bottom: 40px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   margin-bottom: 40px;
@@ -329,6 +339,58 @@ html {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.members-leader-photo-wrap {
+  width: clamp(140px, 15vw, 190px);
+  aspect-ratio: 4 / 5;
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+
+.members-leader-photo-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.2) 35%, transparent 65%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.members-leader-photo-wrap img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  z-index: 2;
+  transition: transform 0.4s ease;
+}
+
+.members-leader:hover .members-leader-photo-wrap img {
+  transform: scale(1.04);
+}
+
+.members-leader-avatar {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background: linear-gradient(145deg, #181818, #282828);
+  display: grid;
+  place-items: center;
+  font: 900 24px FeatureMono, monospace;
+  color: var(--color-white);
+  letter-spacing: 0.05em;
 }
 
 .members-leader-label {
@@ -365,7 +427,7 @@ html {
 }
 
 .members-leader-name {
-  font: 800 clamp(26px, 4vw, 48px) / 1.1 NeueHaasDisplay, sans-serif;
+  font: 800 clamp(22px, 3.2vw, 44px) / 1.15 NeueHaasDisplay, sans-serif;
   letter-spacing: -0.02em;
   color: var(--color-white);
   overflow: hidden; /* Clips SplitType chars on entrance */
@@ -451,6 +513,31 @@ html {
 .members-dir-name {
   font: 500 16px / 1.3 NeueHaasDisplay, sans-serif;
   color: var(--color-white);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.members-dir-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.members-dir-role {
+  font-family: FeatureMono, monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #ff8c00;
+  opacity: 0.9;
+  background: rgba(255, 140, 0, 0.12);
+  padding: 2px 8px;
+  border-radius: 4px;
 }
 
 .members-dir-meta {

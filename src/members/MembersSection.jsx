@@ -571,10 +571,29 @@ export default function MembersSection() {
     const name = person.name || MISSING;
     const by = memberCopy.branchYear(person.branch, person.year);
     const hasDetails = Boolean(by || person.bio || person.linkedin || person.github);
+    const photo = person.photoSrc || null;
 
     return (
       <div className="members-leader" key={person.id}>
-        <span className="members-leader-label">{roleLabel}</span>
+        {photo && (
+          <div className="members-leader-photo-wrap">
+            <img
+              src={photo}
+              alt={name}
+              width={400}
+              height={500}
+              loading="lazy"
+              decoding="async"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
+            />
+            <div className="members-leader-avatar" aria-hidden="true">
+              {initials(name)}
+            </div>
+          </div>
+        )}
+        <span className="members-leader-label">{person.role || roleLabel}</span>
         {hasDetails ? (
           <button
             type="button"
@@ -635,7 +654,20 @@ export default function MembersSection() {
             if (e.key === "Escape") setOpenId(null);
           }}
         >
-          <span className="members-dir-name">{name}</span>
+          <span className="members-dir-name">
+            {person.photoSrc && (
+              <img
+                src={person.photoSrc}
+                alt=""
+                className="members-dir-avatar"
+                loading="lazy"
+              />
+            )}
+            {name}
+            {person.role && person.role !== memberCopy.members && (
+              <span className="members-dir-role">{person.role}</span>
+            )}
+          </span>
           {by && <span className="members-dir-meta">{by}</span>}
           {hasDetails && (
             <span className="members-dir-chevron" aria-hidden="true">
@@ -748,13 +780,29 @@ export default function MembersSection() {
               <div className="members-panel-inner" ref={panelInnerRef}>
                 {team ? (
                   <>
-                    {/* Leaders side-by-side */}
-                    {(team.lead || team.coLead) && (
-                      <div className="members-leaders">
-                        {renderLeader(team.lead, memberCopy.lead, true)}
-                        {renderLeader(team.coLead, memberCopy.coLead, false)}
-                      </div>
-                    )}
+                    {/* Leaders side-by-side / grid */}
+                    {(() => {
+                      const leaders = [
+                        ...(Array.isArray(team.leads) && team.leads.length
+                          ? team.leads
+                          : team.lead ? [team.lead] : []),
+                        ...(Array.isArray(team.coLeads) && team.coLeads.length
+                          ? team.coLeads
+                          : team.coLead ? [team.coLead] : []),
+                      ].filter(Boolean);
+                      if (!leaders.length) return null;
+                      return (
+                        <div className="members-leaders">
+                          {leaders.map((leader, i) =>
+                            renderLeader(
+                              leader,
+                              leader.role || (i === 0 ? memberCopy.lead : memberCopy.coLead),
+                              i === 0,
+                            ),
+                          )}
+                        </div>
+                      );
+                    })()}
 
                     {/* Member directory */}
                     {team.members && team.members.length > 0 && (
@@ -768,7 +816,7 @@ export default function MembersSection() {
                       </div>
                     )}
 
-                    {!team.lead && !team.coLead && (!team.members || !team.members.length) && (
+                    {!team.lead && !team.coLead && (!team.leads || !team.leads.length) && (!team.coLeads || !team.coLeads.length) && (!team.members || !team.members.length) && (
                       <p className="members-empty">{memberCopy.noMembers}</p>
                     )}
                   </>
