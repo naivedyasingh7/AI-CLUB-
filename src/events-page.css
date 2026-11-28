@@ -2,8 +2,7 @@ html:has(body.events-page) {
   scrollbar-gutter: stable;
 }
 .events-page {
-  /* The legacy remote font faces reject cross-origin loads; use the same fallback directly. */
-  font-family: Arial, sans-serif;
+  font-family: var(--font-body, "Inter", sans-serif);
   min-width: 0;
   margin: 0;
   background: var(--color-bg);
@@ -17,7 +16,7 @@ html:has(body.events-page) {
   justify-content: space-between;
   gap: 30px;
   padding: 24px 40px;
-  font-family: Arial, sans-serif;
+  font-family: var(--font-display, "Space Grotesk", sans-serif);
 }
 .events-page-header img {
   width: 78px;
